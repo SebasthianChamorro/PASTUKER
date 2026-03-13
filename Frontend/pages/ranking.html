@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <meta name="theme-color" content="#1a4a2e">
+    <title>Pastuker — Ranking de Jugadores</title>
+    <link rel="manifest" href="../manifest.json">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/ranking.css">
+    <link rel="stylesheet" href="../css/dialogos.css">
+    <style>
+        /* ── Mama Rosa — copiado de profile.css ── */
+        :root { --mama-w:64px; --mama-h:64px; --mama-escala:2.5; }
+
+        .mama-en-card {
+            display: flex; flex-direction: column; align-items: center; gap: 5px;
+            padding: 10px 8px;
+            background: rgba(255,255,255,.03);
+            border: 1px solid rgba(212,175,55,.15);
+            border-radius: 14px;
+            position: relative;
+        }
+        .mama-dos-frames {
+            position: relative;
+            width: calc(var(--mama-w) * var(--mama-escala));
+            height: calc(var(--mama-h) * var(--mama-escala));
+        }
+        .mama-frame {
+            position: absolute; inset: 0;
+            width: 100%; height: 100%;
+            image-rendering: pixelated;
+            image-rendering: crisp-edges;
+        }
+        .mama-f1 { animation: mostrarF1 6s step-end infinite; }
+        .mama-f2 { animation: mostrarF2 6s step-end infinite; }
+        @keyframes mostrarF1 {
+            0%   { opacity: 1; }
+            50%  { opacity: 0; }
+            100% { opacity: 0; }
+        }
+        @keyframes mostrarF2 {
+            0%   { opacity: 0; }
+            50%  { opacity: 1; }
+            100% { opacity: 1; }
+        }
+        .mama-nombre {
+            font-family: 'Press Start 2P', monospace;
+            font-size: 8px; color: #f0d060;
+            letter-spacing: 1px;
+            text-shadow: 0 0 8px rgba(212,175,55,.3);
+        }
+        .mama-titulo-npc {
+            font-size: 9px; font-weight: 600;
+            color: rgba(255,255,255,.45);
+            font-style: italic; letter-spacing: .3px;
+        }
+
+        @media(max-width:380px) { :root { --mama-escala: 2; } }
+        @media(min-width:768px) { :root { --mama-escala: 3; } }
+        @media(prefers-reduced-motion:reduce) {
+            .mama-f1, .mama-f2 { animation: none !important; }
+            .mama-f1 { opacity: 1; }
+            .mama-f2 { opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ESCENA DE FONDO -->
+    <div class="escena" aria-hidden="true">
+        <div class="cielo"></div>
+        <img src="../images/landscale/sun.png"      alt="" class="sol-img">
+        <img src="../images/landscale/clouds.png"   alt="" class="nube-img nube-i1">
+        <img src="../images/landscale/clouds_2.png" alt="" class="nube-img nube-i2">
+        <img src="../images/landscale/cloud_3.png"  alt="" class="nube-img nube-i3">
+        <img src="../images/landscale/clouds.png"   alt="" class="nube-img nube-i4">
+        <img src="../images/landscale/birds.png"    alt="" class="aves aves-1">
+        <img src="../images/landscale/birds.png"    alt="" class="aves aves-2">
+        <div class="montanas-fondo">
+            <img src="../images/landscale/mountain.png" class="montana-img mt-1" alt="">
+            <img src="../images/landscale/mountain.png" class="montana-img mt-2" alt="">
+            <img src="../images/landscale/mountain.png" class="montana-img mt-3" alt="">
+            <img src="../images/landscale/mountain.png" class="montana-img mt-4" alt="">
+            <img src="../images/landscale/mountain.png" class="montana-img mt-5" alt="">
+            <img src="../images/landscale/mountain.png" class="montana-img mt-6" alt="">
+        </div>
+        <div class="capa-fondo">
+            <img src="../images/landscale/tree_2.png" class="arbol-fondo af-1" alt="">
+            <img src="../images/landscale/tree.png"   class="arbol-fondo af-2" alt="">
+            <img src="../images/landscale/tree_3.png" class="arbol-fondo af-3" alt="">
+            <img src="../images/landscale/tree_2.png" class="arbol-fondo af-4" alt="">
+            <img src="../images/landscale/tree.png"   class="arbol-fondo af-5" alt="">
+            <img src="../images/landscale/tree_3.png" class="arbol-fondo af-6" alt="">
+            <img src="../images/landscale/tree.png"   class="arbol-fondo af-7" alt="">
+            <img src="../images/landscale/tree_2.png" class="arbol-fondo af-8" alt="">
+        </div>
+        <div class="capa-media">
+            <img src="../images/landscale/tree_3.png" class="arbol-medio am-1" alt="">
+            <img src="../images/landscale/tree.png"   class="arbol-medio am-2" alt="">
+            <img src="../images/landscale/tree_2.png" class="arbol-medio am-3" alt="">
+            <img src="../images/landscale/tree_3.png" class="arbol-medio am-4" alt="">
+            <img src="../images/landscale/tree.png"   class="arbol-medio am-5" alt="">
+            <img src="../images/landscale/tree_2.png" class="arbol-medio am-6" alt="">
+            <img src="../images/landscale/tree_3.png" class="arbol-medio am-7" alt="">
+            <img src="../images/landscale/tree.png"   class="arbol-medio am-8" alt="">
+        </div>
+        <div class="capa-frente">
+            <img src="../images/landscale/tree_3.png" class="arbol-frente af-f1"  alt="">
+            <img src="../images/landscale/tree.png"   class="arbol-frente af-f2"  alt="">
+            <img src="../images/landscale/tree_2.png" class="arbol-frente af-f3"  alt="">
+            <img src="../images/landscale/tree_3.png" class="arbol-frente af-f4"  alt="">
+            <img src="../images/landscale/tree_2.png" class="arbol-frente af-f6"  alt="">
+            <img src="../images/landscale/tree_3.png" class="arbol-frente af-f7"  alt="">
+            <img src="../images/landscale/tree.png"   class="arbol-frente af-f8"  alt="">
+            <img src="../images/landscale/tree_2.png" class="arbol-frente af-f9"  alt="">
+            <img src="../images/landscale/tree_3.png" class="arbol-frente af-f10" alt="">
+        </div>
+        <div class="capa-arbustos">
+            <img src="../images/landscale/bush.png"   class="arbusto ab-1"  alt="">
+            <img src="../images/landscale/bush_2.png" class="arbusto ab-2"  alt="">
+            <img src="../images/landscale/bush.png"   class="arbusto ab-3"  alt="">
+            <img src="../images/landscale/bush_2.png" class="arbusto ab-4"  alt="">
+            <img src="../images/landscale/bush_2.png" class="arbusto ab-7"  alt="">
+            <img src="../images/landscale/bush.png"   class="arbusto ab-8"  alt="">
+            <img src="../images/landscale/bush_2.png" class="arbusto ab-9"  alt="">
+            <img src="../images/landscale/bush.png"   class="arbusto ab-10" alt="">
+        </div>
+        <div class="suelo-hierba"></div>
+        <div class="suelo-tierra"></div>
+        <div class="particulas">
+            <div class="particula p-1"></div>
+            <div class="particula p-2"></div>
+            <div class="particula p-3"></div>
+            <div class="particula p-4"></div>
+            <div class="particula p-5"></div>
+            <div class="particula p-6"></div>
+            <div class="particula p-7"></div>
+            <div class="particula p-8"></div>
+        </div>
+    </div>
+
+    <main class="contenido-principal">
+        <div class="ranking-card" id="rankingCard">
+
+            <!-- ── ENCABEZADO ── -->
+            <div class="ranking-header">
+                <h1 class="ranking-titulo">Ranking de Jugadores</h1>
+                <p class="ranking-subtitulo">Compite y sube en la tabla de posiciones</p>
+                <div class="deco-linea">
+                    <span class="linea-deco"></span>
+                    <span class="icono-deco">✦</span>
+                    <span class="linea-deco"></span>
+                </div>
+            </div>
+
+            <!-- ── MAMA ROSA ── -->
+            <div class="mama-en-card">
+
+                <!-- Botón regresar — primer hijo, igual que profile.html -->
+                <a href="menugeneral.html" class="btn-regresar" aria-label="Regresar">
+                    <svg viewBox="0 0 24 24" fill="none">
+                        <path d="M19 12H5M5 12l7-7M5 12l7 7" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </a>
+
+                <div class="mama-dos-frames">
+                    <img src="../images/mama/mama_frame1.png" class="mama-frame mama-f1" alt="Mama Rosa">
+                    <img src="../images/mama/mama_frame2.png" class="mama-frame mama-f2" alt="">
+                </div>
+                <p class="mama-nombre">Mama Rosa</p>
+                <p class="mama-titulo-npc">Sabia Ancestral · Guardiana de Rituales</p>
+            </div>
+
+            <!-- ── TARJETAS DE RANKING ── -->
+            <div class="ranking-grid">
+
+                <a href="ranking-tabla.html?modo=general" class="ranking-item card-general" id="cardGeneral">
+                    <div class="ranking-icono-wrap icono-general">
+                        <img src="../images/icons/trophy.png" alt="Ranking General" class="ranking-png png-trofeo">
+                    </div>
+                    <div class="ranking-info">
+                        <p class="ranking-item-titulo">Ranking General</p>
+                        <p class="ranking-item-desc">Los mejores jugadores en todos los juegos</p>
+                    </div>
+                    <div class="ranking-badge badge-general">
+                        <span class="badge-icono">🏆</span>
+                        <span class="badge-texto">Jugadores Top</span>
+                    </div>
+                    <div class="card-brillo"></div>
+                </a>
+
+                <a href="ranking-tabla.html?modo=plantas" class="ranking-item card-plantas" id="cardPlantas">
+                    <div class="ranking-icono-wrap icono-plantas">
+                        <img src="../images/icons/plant.png" alt="Plantas Medicinales" class="ranking-png png-plantas">
+                    </div>
+                    <div class="ranking-info">
+                        <p class="ranking-item-titulo">Plantas Medicinales</p>
+                        <p class="ranking-item-desc">Expertos en conocimiento de plantas medicinales</p>
+                    </div>
+                    <div class="ranking-badge badge-plantas">
+                        <span class="badge-icono">🌿</span>
+                        <span class="badge-texto">Jugadores Top</span>
+                    </div>
+                    <div class="card-brillo"></div>
+                </a>
+
+                <a href="ranking-tabla.html?modo=rituales" class="ranking-item card-rituales" id="cardRituales">
+                    <div class="ranking-icono-wrap icono-rituales">
+                        <img src="../images/icons/fire.png" alt="Rituales Ancestrales" class="ranking-png png-fuego">
+                    </div>
+                    <div class="ranking-info">
+                        <p class="ranking-item-titulo">Rituales Ancestrales</p>
+                        <p class="ranking-item-desc">Expertos en rituales de la comunidad</p>
+                    </div>
+                    <div class="ranking-badge badge-rituales">
+                        <span class="badge-icono">🔥</span>
+                        <span class="badge-texto">Jugadores Top</span>
+                    </div>
+                    <div class="card-brillo"></div>
+                </a>
+
+            </div>
+
+            <!-- ── CÓMO FUNCIONA ── -->
+            <div class="como-funciona" id="comoFunciona">
+                <div class="cf-icono">
+                    <svg viewBox="0 0 24 24" fill="none">
+                        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                        <circle cx="12" cy="8"  r="1.5" fill="currentColor"/>
+                        <rect x="10.5" y="11" width="3" height="7" rx="1.5" fill="currentColor"/>
+                    </svg>
+                </div>
+                <p class="cf-titulo">¿Cómo funciona el ranking?</p>
+                <p class="cf-texto">
+                    Gana puntos respondiendo correctamente en los juegos.
+                    ¡Entre más puntos, mejor posición!
+                </p>
+            </div>
+
+        </div>
+    </main>
+
+    <script src="../js/ranking.js"></script>
+    <script src="../js/dialogos.js"></script>
+    <script>
+        window.addEventListener('load', () => {
+            DialogoSistema.mostrarConDelay('ranking_bienvenida', 1000);
+        });
+    </script>
+</body>
+</html>

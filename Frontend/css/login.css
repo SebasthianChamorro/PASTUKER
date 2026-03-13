@@ -1,0 +1,652 @@
+/* ================================================
+   Pastuker — login.css
+   Pantalla de inicio de sesión
+   ================================================ */
+
+:root {
+    /* Paleta cultural Pastos (igual que index) */
+    --verde-bosque:      #1a4a2e;
+    --verde-medio:       #2d6b4a;
+    --verde-claro:       #3d8b5e;
+    --verde-hierba:      #5aab3a;
+    --verde-hierba-luz:  #7dc954;
+    --dorado:            #d4af37;
+    --dorado-claro:      #f0d060;
+    --marron-claro:      #a0522d;
+    --marron-oscuro:     #5c2a0a;
+    --roca-media:        #8b7355;
+
+    --fuente-pixel: 'Press Start 2P', monospace;
+    --fuente-cuerpo: 'Nunito', sans-serif;
+
+    /* Z-index de capas */
+    --z-cielo:     1;
+    --z-montanas:  2;
+    --z-fondo:     3;
+    --z-media:     4;
+    --z-frente:    5;
+    --z-arbustos:  6;
+    --z-hierba:    7;
+    --z-suelo:     8;
+    --z-part:      9;
+    --z-contenido: 10;
+
+    /* Sprite Mama Rosa */
+    --mama-w: 64px;
+    --mama-h: 64px;
+    --mama-escala: 3;
+}
+
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html, body { width:100%; height:100%; overflow-x:hidden; font-family:var(--fuente-cuerpo); }
+body { background: var(--verde-bosque); }
+a { text-decoration: none; }
+button { cursor: pointer; font-family: inherit; border: none; background: none; }
+
+
+/* ================================================
+   ESCENA DE FONDO 
+   ================================================ */
+
+.escena {
+    position: fixed; inset: 0; overflow: hidden;
+}
+
+/* Cielo */
+.cielo {
+    position: absolute; inset: 0;
+    background: linear-gradient(
+        to bottom,
+        #1e7ba8 0%, #3ab5d6 25%, #7ecfe8 45%,
+        #c8e8f0 60%, #f5d878 80%, #f0b830 100%
+    );
+    z-index: var(--z-cielo);
+}
+
+/* Sol PNG */
+.sol-img {
+    position: absolute; top: 5%; right: 12%;
+    width: 100px; height: 100px;
+    mix-blend-mode: lighten;
+    z-index: var(--z-cielo);
+    filter: drop-shadow(0 0 18px rgba(240,208,96,0.6));
+    animation: solBrillo 4s ease-in-out infinite alternate;
+}
+@keyframes solBrillo {
+    from { filter:drop-shadow(0 0 18px rgba(240,208,96,0.5)); transform:scale(1); }
+    to   { filter:drop-shadow(0 0 32px rgba(240,208,96,0.9)); transform:scale(1.04); }
+}
+
+/* Nubes PNG */
+.nube-img {
+    position: absolute; mix-blend-mode: screen;
+    z-index: var(--z-cielo); opacity:0.92;
+}
+.nube-i1 { top:6%;  left:-160px; width:160px; animation:flotarNube 55s linear infinite; }
+.nube-i2 { top:16%; left:-130px; width:120px; animation:flotarNube 65s linear infinite; animation-delay:-20s; }
+.nube-i3 { top:4%;  right:-150px;width:150px; animation:flotarNubeInv 55s linear infinite; animation-delay:-12s; }
+.nube-i4 { top:1%;  left:-140px; width:100px; opacity:0.7; animation:flotarNube 75s linear infinite; animation-delay:-35s; }
+@keyframes flotarNube    { from{transform:translateX(0)} to{transform:translateX(calc(100vw + 220px))} }
+@keyframes flotarNubeInv { from{transform:translateX(0)} to{transform:translateX(calc(-100vw - 220px))} }
+
+/* Montañas PNG */
+.montanas-fondo { position:absolute; bottom:22%; left:0; width:100%; height:420px; display:flex; align-items:flex-end; z-index:var(--z-montanas); opacity:.88; }
+.montana-img { mix-blend-mode:multiply; flex-shrink:0; margin-right:-18px; min-width:600px; width:600px; height:auto; }
+
+/* Capas de árboles y arbustos */
+.capa-fondo,.capa-media,.capa-frente,.capa-arbustos {
+    position:absolute; left:0; bottom:0; width:100%; height:100%;
+    pointer-events:none; transition:transform 0.12s ease-out;
+}
+.capa-fondo   { z-index:var(--z-fondo);    }
+.capa-media   { z-index:var(--z-media);    }
+.capa-frente  { z-index:var(--z-frente);   }
+.capa-arbustos{ z-index:var(--z-arbustos); }
+
+.arbol-fondo,.arbol-medio,.arbol-frente,.arbusto {
+    position:absolute; image-rendering:auto;
+}
+
+/* Árboles fondo */
+.arbol-fondo { bottom:28%; opacity:0.75; }
+.af-1{left:0%;   width:75px; bottom:30%} .af-2{left:8%;  width:60px;bottom:32%}
+.af-3{left:16%;  width:80px; bottom:29%} .af-4{left:25%; width:65px;bottom:31%}
+.af-5{left:55%;  width:60px; bottom:32%} .af-6{left:65%; width:80px;bottom:30%}
+.af-7{right:16%; width:65px; bottom:31%} .af-8{right:7%; width:75px;bottom:29%}
+
+/* Árboles medios */
+.arbol-medio { bottom:18%; }
+.am-1{left:0%;   width:110px;bottom:20%} .am-2{left:7%;  width:95px; bottom:22%}
+.am-3{left:16%;  width:115px;bottom:19%} .am-4{left:25%; width:90px; bottom:21%}
+.am-5{right:25%; width:95px; bottom:21%} .am-6{right:16%;width:110px;bottom:19%}
+.am-7{right:7%;  width:100px;bottom:22%} .am-8{right:0%; width:115px;bottom:20%}
+
+/* Árboles frente */
+.arbol-frente { bottom:10%; }
+.af-f1{left:0%;   width:160px;bottom:12%} .af-f2{left:9%;  width:140px;bottom:14%}
+.af-f3{left:18%;  width:170px;bottom:11%} .af-f4{left:27%; width:130px;bottom:13%}
+.af-f6{right:35%; width:110px;bottom:14%;opacity:0.9}
+.af-f7{right:27%; width:130px;bottom:13%} .af-f8{right:18%;width:170px;bottom:11%}
+.af-f9{right:9%;  width:140px;bottom:14%} .af-f10{right:0%;width:160px;bottom:12%}
+
+/* Arbustos */
+.arbusto { bottom:8%; }
+.ab-1{left:1%;  width:70px;bottom:10%} .ab-2{left:9%;  width:55px;bottom:9%}
+.ab-3{left:17%; width:65px;bottom:11%} .ab-4{left:26%; width:50px;bottom:9%}
+.ab-7{right:26%;width:55px;bottom:10%} .ab-8{right:17%;width:65px;bottom:11%}
+.ab-9{right:9%; width:55px;bottom:9%}  .ab-10{right:1%;width:70px;bottom:10%}
+
+/* Hierba y tierra */
+.suelo-hierba {
+    position:absolute; bottom:8%; left:0; width:100%; height:10%;
+    background:linear-gradient(to bottom,var(--verde-hierba-luz),var(--verde-hierba));
+    z-index:var(--z-hierba);
+    clip-path:polygon(
+        0% 30%,3% 10%,6% 30%,10% 5%,14% 25%,18% 8%,22% 28%,26% 12%,
+        30% 28%,34% 6%,38% 26%,42% 10%,46% 30%,50% 8%,54% 28%,58% 12%,
+        62% 30%,66% 5%,70% 25%,74% 10%,78% 28%,82% 6%,86% 26%,90% 12%,
+        94% 28%,97% 8%,100% 20%,100% 100%,0% 100%
+    );
+}
+.suelo-tierra {
+    position:absolute; bottom:0; left:0; width:100%; height:8%;
+    background:linear-gradient(to bottom,var(--marron-claro),var(--marron-oscuro));
+    z-index:var(--z-suelo);
+}
+
+/* Partículas */
+.particulas { position:absolute; inset:0; z-index:var(--z-part); pointer-events:none; }
+.particula { position:absolute; border-radius:50%; background:rgba(240,208,96,0.9); box-shadow:0 0 6px 3px rgba(240,208,96,0.4); animation:flotarParticula var(--dur,6s) ease-in-out infinite; }
+.p-1{width:5px;height:5px;left:8%; bottom:25%;--dur:5s;  animation-delay:0s}
+.p-2{width:4px;height:4px;left:22%;bottom:40%;--dur:7s;  animation-delay:1s}
+.p-3{width:6px;height:6px;left:38%;bottom:30%;--dur:6s;  animation-delay:2s}
+.p-4{width:3px;height:3px;left:62%;bottom:45%;--dur:8s;  animation-delay:0.5s}
+.p-5{width:5px;height:5px;left:78%;bottom:22%;--dur:5.5s;animation-delay:3s}
+.p-6{width:4px;height:4px;left:90%;bottom:38%;--dur:7.5s;animation-delay:1.5s}
+@keyframes flotarParticula {
+    0%  {transform:translateY(0) scale(1);opacity:0}
+    20% {opacity:1}
+    50% {transform:translateY(-40px) scale(1.2) translateX(10px)}
+    80% {opacity:0.7}
+    100%{transform:translateY(-80px) scale(0.8) translateX(-5px);opacity:0}
+}
+
+
+/* ================================================
+   LAYOUT PRINCIPAL
+   ================================================ */
+
+.contenido-principal {
+    position: relative; z-index: var(--z-contenido);
+    display: flex; align-items: center; justify-content: center;
+    width: 100%; min-height: 100vh;
+    padding: 16px; gap: 0;
+    /* Permite scroll si el contenido es muy alto en móvil */
+    overflow-y: auto;
+}
+
+
+/* ================================================
+   MAMA ROSA — dentro de la card 
+   ================================================ */
+
+.mama-en-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    margin-top: 4px;
+    padding: 10px 8px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(212,175,55,0.15);
+    border-radius: 14px;
+}
+
+/* Burbuja de diálogo */
+.mama-burbuja {
+    background: rgba(212,175,55,0.12);
+    border: 1px solid rgba(212,175,55,0.35);
+    border-radius: 10px;
+    padding: 8px 14px;
+    position: relative;
+    text-align: center;
+    /* Colita apuntando hacia abajo hacia el sprite */
+    margin-bottom: 4px;
+}
+.mama-burbuja::after {
+    content: '';
+    position: absolute;
+    bottom: -8px; left: 50%;
+    transform: translateX(-50%);
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-top: 8px solid rgba(212,175,55,0.35);
+}
+.mama-frase {
+    font-family: var(--fuente-pixel);
+    font-size: 7px; line-height: 1.8;
+    color: var(--dorado-claro);
+    animation: aparecer 1s ease-out 0.8s both;
+}
+
+/* Sprite de 2 frames */
+.mama-dos-frames {
+    position: relative;
+    width:  calc(var(--mama-w) * var(--mama-escala));
+    height: calc(var(--mama-h) * var(--mama-escala));
+}
+.mama-frame {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+}
+/* Frame 1 visible 3s → invisible */
+.mama-f1 { animation: mostrarF1 6s step-end infinite; }
+/* Frame 2 invisible → visible 3s */
+.mama-f2 { animation: mostrarF2 6s step-end infinite; }
+@keyframes mostrarF1 { 0%{opacity:1} 50%{opacity:0} 100%{opacity:0} }
+@keyframes mostrarF2 { 0%{opacity:0} 50%{opacity:1} 100%{opacity:1} }
+
+.mama-nombre {
+    font-family: var(--fuente-pixel);
+    font-size: 8px; color: var(--dorado-claro);
+    letter-spacing: 1px;
+    text-shadow: 0 0 8px rgba(212,175,55,0.3);
+}
+.mama-titulo-npc {
+    font-size: 9px; font-weight: 600;
+    color: rgba(255,255,255,0.45);
+    letter-spacing: 0.3px;
+}
+
+
+/* ================================================
+   LOGIN CARD
+   ================================================ */
+
+.login-card {
+    background: rgba(12, 35, 22, 0.88);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border: 1px solid rgba(212,175,55,0.28);
+    border-radius: 24px;
+    padding: 32px 28px 24px;
+    width: 100%; max-width: 400px;
+    box-shadow:
+        0 10px 40px rgba(0,0,0,0.55),
+        0 0 0 1px rgba(212,175,55,0.08),
+        inset 0 1px 0 rgba(255,255,255,0.05);
+    /* overflow-y por si el contenido excede en móvil pequeño */
+    overflow-y: auto;
+    max-height: calc(100vh - 32px);
+}
+
+/* ── Encabezado ── */
+.login-header {
+    display: flex; flex-direction: column;
+    align-items: center; gap: 6px;
+    margin-bottom: 20px;
+    animation: bajarEntrada 0.6s ease-out 0.1s both;
+}
+@keyframes bajarEntrada {
+    from { opacity:0; transform:translateY(-16px); }
+    to   { opacity:1; transform:translateY(0); }
+}
+
+.login-titulo {
+    font-family: var(--fuente-pixel);
+    font-size: clamp(16px, 4vw, 22px);
+    color: var(--dorado-claro);
+    text-shadow: 2px 2px 0 var(--marron-oscuro), 0 0 16px rgba(212,175,55,0.4);
+    letter-spacing: 1px;
+}
+.login-subtitulo {
+    font-size: 13px; font-weight: 600;
+    color: rgba(255,255,255,0.55);
+    letter-spacing: 0.3px;
+}
+
+/* Línea decorativa */
+.deco-linea {
+    display: flex; align-items: center; gap: 8px; margin-top: 4px;
+}
+.linea-deco {
+    display: block; width: 50px; height: 1px;
+    background: linear-gradient(to right, transparent, var(--dorado), transparent);
+}
+.icono-deco { color: var(--dorado); font-size: 10px; }
+
+
+/* ── Campos del formulario ── */
+.login-form { display: flex; flex-direction: column; gap: 16px; }
+
+.campo-grupo { display: flex; flex-direction: column; gap: 6px; }
+
+.campo-label {
+    display: flex; align-items: center; gap: 8px;
+    font-family: var(--fuente-pixel);
+    font-size: 9px; color: var(--dorado);
+    letter-spacing: 0.5px;
+}
+.label-icono {
+    width: 16px; height: 16px;
+    color: var(--dorado); flex-shrink: 0;
+}
+
+.input-wrapper {
+    position: relative;
+    display: flex; align-items: center;
+}
+
+.campo-input {
+    width: 100%;
+    padding: 12px 16px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(212,175,55,0.2);
+    border-radius: 10px;
+    color: #fff;
+    font-family: var(--fuente-cuerpo);
+    font-size: 14px; font-weight: 600;
+    outline: none;
+    transition: border-color 0.25s, background 0.25s, box-shadow 0.25s;
+    /* Espacio extra derecha cuando hay botón ojo */
+    padding-right: 44px;
+}
+
+.campo-input::placeholder {
+    color: rgba(255,255,255,0.28);
+    font-weight: 400;
+}
+
+/* Estado focus: borde dorado + brillo sutil */
+.campo-input:focus {
+    border-color: rgba(212,175,55,0.6);
+    background: rgba(255,255,255,0.09);
+    box-shadow: 0 0 0 3px rgba(212,175,55,0.1);
+}
+
+/* Estado error */
+.campo-error-activo .campo-input {
+    border-color: rgba(220, 80, 80, 0.7);
+    box-shadow: 0 0 0 3px rgba(220,80,80,0.1);
+}
+
+/* Mensaje de error bajo el campo */
+.campo-error {
+    font-size: 10px; font-weight: 700;
+    color: #ff7070;
+    min-height: 14px;
+    padding-left: 4px;
+}
+
+/* Botón mostrar/ocultar contraseña */
+.btn-ojo {
+    position: absolute; right: 12px;
+    width: 24px; height: 24px;
+    display: flex; align-items: center; justify-content: center;
+    color: rgba(212,175,55,0.6);
+    transition: color 0.2s;
+}
+.btn-ojo:hover { color: var(--dorado); }
+.btn-ojo svg  { width: 18px; height: 18px; }
+
+
+/* ── Fila opciones: Recordarme + Olvidaste ── */
+.fila-opciones {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: -4px;
+}
+
+/* Checkbox personalizado */
+.check-label {
+    display: flex; align-items: center; gap: 8px;
+    cursor: pointer;
+}
+.check-input { display: none; }
+
+.check-custom {
+    width: 16px; height: 16px;
+    border: 2px solid rgba(212,175,55,0.4);
+    border-radius: 3px;
+    background: rgba(255,255,255,0.04);
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s;
+    flex-shrink: 0;
+}
+/* Marca de check cuando está activado */
+.check-input:checked + .check-custom {
+    background: var(--verde-medio);
+    border-color: var(--dorado);
+}
+.check-input:checked + .check-custom::after {
+    content: '✓';
+    font-size: 10px;
+    color: var(--dorado-claro);
+    font-weight: 900;
+    line-height: 1;
+}
+.check-texto {
+    font-size: 11px; font-weight: 600;
+    color: rgba(255,255,255,0.6);
+}
+
+.link-recuperar {
+    font-family: var(--fuente-pixel);
+    font-size: 8px; color: var(--dorado);
+    letter-spacing: 0.3px;
+    transition: color 0.2s, text-shadow 0.2s;
+}
+.link-recuperar:hover {
+    color: var(--dorado-claro);
+    text-shadow: 0 0 8px rgba(212,175,55,0.4);
+}
+
+
+/* ── Botón Iniciar Sesión ── */
+.btn-login {
+    width: 100%;
+    padding: 14px;
+    margin-top: 4px;
+    background: linear-gradient(135deg, #2d8b4a, #1a5c38);
+    border: 1px solid rgba(212,175,55,0.4);
+    border-radius: 12px;
+    font-family: var(--fuente-pixel);
+    font-size: 11px; letter-spacing: 1px;
+    color: var(--dorado-claro);
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    box-shadow: 0 4px 15px rgba(45,107,74,0.45), inset 0 1px 0 rgba(255,255,255,0.08);
+    transition: all 0.25s ease;
+    position: relative; overflow: hidden;
+}
+.btn-login::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.08) 0%, transparent 60%);
+    opacity: 0; transition: opacity 0.25s;
+}
+.btn-login:hover::before { opacity: 1; }
+.btn-login:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 22px rgba(45,107,74,0.6), inset 0 1px 0 rgba(255,255,255,0.12);
+}
+.btn-login:active { transform: translateY(0); }
+.btn-login:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+/* Spinner girando */
+.btn-spinner {
+    display: inline-block;
+    animation: girar 0.7s linear infinite;
+    font-size: 16px;
+}
+@keyframes girar { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+
+
+/* ── Error general del login ── */
+.login-error {
+    display: flex; align-items: center; gap: 8px;
+    background: rgba(220,80,80,0.12);
+    border: 1px solid rgba(220,80,80,0.3);
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 12px; font-weight: 700;
+    color: #ff7070;
+    animation: aparecer 0.3s ease-out;
+}
+.error-icono { font-size: 16px; flex-shrink: 0; }
+
+/* Animación de sacudida al fallar el login */
+@keyframes shake {
+    0%,100%{ transform: translateX(0) translateY(0); }
+    15%    { transform: translateX(-8px) translateY(0); }
+    30%    { transform: translateX(8px) translateY(0); }
+    45%    { transform: translateX(-5px) translateY(0); }
+    60%    { transform: translateX(5px) translateY(0); }
+    75%    { transform: translateX(-3px) translateY(0); }
+}
+.login-card.shake { animation: shake 0.6s ease-out; }
+
+
+/* ── Enlace a registro ── */
+.link-registro {
+    text-align: center;
+    margin-top: 18px;
+    font-size: 12px; font-weight: 600;
+    color: rgba(255,255,255,0.45);
+}
+.link-registro-enlace {
+    font-family: var(--fuente-pixel);
+    font-size: 9px; color: var(--dorado);
+    letter-spacing: 0.3px;
+    transition: color 0.2s, text-shadow 0.2s;
+}
+.link-registro-enlace:hover {
+    color: var(--dorado-claro);
+    text-shadow: 0 0 8px rgba(212,175,55,0.4);
+}
+
+/* ── Separador "o" ── */
+.separador-o {
+    display: flex; align-items: center; gap: 12px;
+    margin: 14px 0 10px;
+}
+.sep-linea {
+    flex: 1; height: 1px;
+    background: linear-gradient(to right, transparent, rgba(212,175,55,0.2), transparent);
+}
+.sep-texto {
+    font-family: var(--fuente-pixel);
+    font-size: 9px; color: rgba(212,175,55,0.4);
+    letter-spacing: 2px;
+}
+
+/* ── Botón jugar como invitado ── */
+.btn-invitado {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    width: 100%; padding: 11px;
+    background: transparent;
+    border: 1px solid rgba(212,175,55,0.25);
+    border-radius: 10px;
+    font-family: var(--fuente-pixel);
+    font-size: 8px; letter-spacing: 0.5px;
+    color: rgba(212,175,55,0.65);
+    transition: all 0.2s ease;
+}
+.btn-invitado:hover {
+    background: rgba(212,175,55,0.08);
+    border-color: rgba(212,175,55,0.5);
+    color: var(--dorado);
+    transform: translateY(-1px);
+}
+
+
+/* ── Aves ── */
+.aves {
+    position: absolute;
+    z-index: var(--z-cielo);
+    opacity: 0.75;
+}
+.aves-1 {
+    top: 12%; left: -120px;
+    width: 90px;
+    animation: volarAves 18s linear infinite;
+    animation-delay: -4s;
+}
+.aves-2 {
+    top: 22%; right: -100px;
+    width: 65px;
+    opacity: 0.65;
+    animation: volarAvesInv 24s linear infinite;
+    animation-delay: -12s;
+}
+@keyframes volarAves {
+    0%   { transform: translateX(0)              translateY(0); }
+    25%  { transform: translateX(calc(25vw))     translateY(-8px); }
+    50%  { transform: translateX(calc(50vw))     translateY(0); }
+    75%  { transform: translateX(calc(75vw))     translateY(-6px); }
+    100% { transform: translateX(calc(100vw + 150px)) translateY(0); }
+}
+@keyframes volarAvesInv {
+    0%   { transform: translateX(0)               translateY(0); }
+    25%  { transform: translateX(calc(-25vw))      translateY(-6px); }
+    50%  { transform: translateX(calc(-50vw))      translateY(0); }
+    75%  { transform: translateX(calc(-75vw))      translateY(-8px); }
+    100% { transform: translateX(calc(-100vw - 150px)) translateY(0); }
+}
+
+
+/* ================================================
+   RESPONSIVO
+   ================================================ */
+
+/* Pantallas pequeñas */
+@media (max-width: 380px) {
+    .login-card { padding: 24px 16px 20px; }
+    .login-titulo { font-size: 16px; }
+    .campo-input { padding: 10px 14px; font-size: 13px; }
+}
+
+/* PC ≥1024px */
+@media (min-width: 1024px) {
+    .contenido-principal { gap: 60px; }
+    .login-card { max-width: 420px; }
+    /* Mama Rosa un poco más grande en PC */
+    :root { --mama-escala: 3.5; }
+}
+
+/* PC grande ≥1280px */
+@media (min-width: 1280px) {
+    :root { --mama-escala: 4; }
+}
+
+/* Accesibilidad */
+@media (prefers-reduced-motion: reduce) {
+    .nube-img,.sol-img,.particula,
+    .avatar-ring-deco, .btn-spinner,
+    .mama-f1,.mama-f2 { animation: none !important; }
+    .mama-f1 { opacity: 1; }
+    .mama-f2 { opacity: 0; }
+}
+
+.btn-volver {
+    position: fixed;
+    top: 16px;
+    left: 16px;
+    z-index: 100;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 8px;
+    color: #d4af37;
+    text-decoration: none;
+    background: rgba(8, 22, 13, 0.85);
+    border: 1px solid rgba(212, 175, 55, 0.35);
+    padding: 8px 14px;
+    border-radius: 8px;
+    backdrop-filter: blur(8px);
+    transition: all 0.2s;
+}
+.btn-volver:hover {
+    background: rgba(212, 175, 55, 0.15);
+    border-color: rgba(212, 175, 55, 0.7);
+}

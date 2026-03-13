@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <meta name="theme-color" content="#1a4a2e">
+    <title>Pastuker — Menú Principal</title>
+    <link rel="manifest" href="../manifest.json">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/menugeneral.css">
+    <link rel="stylesheet" href="../css/dialogos.css">
+</head>
+<body>
+
+    <!-- ESCENA DE FONDO -->
+    <div class="escena" aria-hidden="true">
+        <div class="cielo"></div>
+        <img src="../images/landscale/sun.png" alt="" class="sol-img">
+        <img src="../images/landscale/clouds.png"   alt="" class="nube-img nube-i1">
+        <img src="../images/landscale/clouds_2.png" alt="" class="nube-img nube-i2">
+        <img src="../images/landscale/cloud_3.png"  alt="" class="nube-img nube-i3">
+        <img src="../images/landscale/clouds.png"   alt="" class="nube-img nube-i4">
+        <img src="../images/landscale/birds.png"    alt="" class="aves aves-1">
+        <img src="../images/landscale/birds.png"    alt="" class="aves aves-2">
+        <div class="montanas-fondo">
+            <img src="../images/landscale/mountain.png" class="montana-img mt-1" alt="">
+            <img src="../images/landscale/mountain.png" class="montana-img mt-2" alt="">
+            <img src="../images/landscale/mountain.png" class="montana-img mt-3" alt="">
+            <img src="../images/landscale/mountain.png" class="montana-img mt-4" alt="">
+            <img src="../images/landscale/mountain.png" class="montana-img mt-5" alt="">
+            <img src="../images/landscale/mountain.png" class="montana-img mt-6" alt="">
+        </div>
+        <div class="capa-fondo">
+            <img src="../images/landscale/tree_2.png" class="arbol-fondo af-1" alt="">
+            <img src="../images/landscale/tree.png"   class="arbol-fondo af-2" alt="">
+            <img src="../images/landscale/tree_3.png" class="arbol-fondo af-3" alt="">
+            <img src="../images/landscale/tree_2.png" class="arbol-fondo af-4" alt="">
+            <img src="../images/landscale/tree.png"   class="arbol-fondo af-5" alt="">
+            <img src="../images/landscale/tree_3.png" class="arbol-fondo af-6" alt="">
+            <img src="../images/landscale/tree.png"   class="arbol-fondo af-7" alt="">
+            <img src="../images/landscale/tree_2.png" class="arbol-fondo af-8" alt="">
+        </div>
+        <div class="capa-media">
+            <img src="../images/landscale/tree_3.png" class="arbol-medio am-1" alt="">
+            <img src="../images/landscale/tree.png"   class="arbol-medio am-2" alt="">
+            <img src="../images/landscale/tree_2.png" class="arbol-medio am-3" alt="">
+            <img src="../images/landscale/tree_3.png" class="arbol-medio am-4" alt="">
+            <img src="../images/landscale/tree.png"   class="arbol-medio am-5" alt="">
+            <img src="../images/landscale/tree_2.png" class="arbol-medio am-6" alt="">
+            <img src="../images/landscale/tree_3.png" class="arbol-medio am-7" alt="">
+            <img src="../images/landscale/tree.png"   class="arbol-medio am-8" alt="">
+        </div>
+        <div class="capa-frente">
+            <img src="../images/landscale/tree_3.png" class="arbol-frente af-f1"  alt="">
+            <img src="../images/landscale/tree.png"   class="arbol-frente af-f2"  alt="">
+            <img src="../images/landscale/tree_2.png" class="arbol-frente af-f3"  alt="">
+            <img src="../images/landscale/tree_3.png" class="arbol-frente af-f4"  alt="">
+            <img src="../images/landscale/tree_2.png" class="arbol-frente af-f6"  alt="">
+            <img src="../images/landscale/tree_3.png" class="arbol-frente af-f7"  alt="">
+            <img src="../images/landscale/tree.png"   class="arbol-frente af-f8"  alt="">
+            <img src="../images/landscale/tree_2.png" class="arbol-frente af-f9"  alt="">
+            <img src="../images/landscale/tree_3.png" class="arbol-frente af-f10" alt="">
+        </div>
+        <div class="capa-arbustos">
+            <img src="../images/landscale/bush.png"   class="arbusto ab-1"  alt="">
+            <img src="../images/landscale/bush_2.png" class="arbusto ab-2"  alt="">
+            <img src="../images/landscale/bush.png"   class="arbusto ab-3"  alt="">
+            <img src="../images/landscale/bush_2.png" class="arbusto ab-4"  alt="">
+            <img src="../images/landscale/bush_2.png" class="arbusto ab-7"  alt="">
+            <img src="../images/landscale/bush.png"   class="arbusto ab-8"  alt="">
+            <img src="../images/landscale/bush_2.png" class="arbusto ab-9"  alt="">
+            <img src="../images/landscale/bush.png"   class="arbusto ab-10" alt="">
+        </div>
+        <div class="suelo-hierba"></div>
+        <div class="suelo-tierra"></div>
+        <div class="particulas">
+            <div class="particula p-1"></div>
+            <div class="particula p-2"></div>
+            <div class="particula p-3"></div>
+            <div class="particula p-4"></div>
+            <div class="particula p-5"></div>
+            <div class="particula p-6"></div>
+            <div class="particula p-7"></div>
+            <div class="particula p-8"></div>
+        </div>
+    </div>
+
+    <main class="contenido-principal">
+        <div class="menu-card" id="menuCard">
+
+            <div class="menu-header">
+
+                <!-- Taita Lorenzo -->
+                <div class="taita-contenedor">
+
+                    <!-- Botón regresar — dentro del contenedor del taita -->
+                    <a href="../index.html" class="btn-regresar" aria-label="Volver">
+                        <svg viewBox="0 0 24 24" fill="none">
+                            <path d="M19 12H5M5 12l7-7M5 12l7 7" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </a>
+
+                    <div class="taita-dos-frames">
+                        <img src="../images/taita/taita_frame1.png" class="taita-frame taita-f1" alt="Taita Lorenzo">
+                        <img src="../images/taita/taita_frame2.png" class="taita-frame taita-f2" alt="">
+                    </div>
+                    <p class="taita-nombre">Taita Lorenzo</p>
+                    <p class="taita-titulo">Sabedor Ancestral · Guía del Bosque</p>
+                </div>
+
+                <div class="saludo-wrap">
+                    <p class="saludo-bienvenido">Bienvenido</p>
+                    <p class="saludo-nombre" id="nombreUsuario">Explorador</p>
+                    <div class="deco-linea">
+                        <span class="linea-deco"></span>
+                        <span class="icono-deco">✦</span>
+                        <span class="linea-deco"></span>
+                    </div>
+                </div>
+            </div>
+
+            <nav class="menu-grid" aria-label="Menú principal">
+
+                <a href="juegos.html" class="menu-item item-juegos" id="itemJuegos">
+                    <div class="item-icono">
+                        <svg viewBox="0 0 64 64" fill="none">
+                            <rect x="8" y="20" width="48" height="28" rx="14" fill="#2d8b4a" stroke="#d4af37" stroke-width="2"/>
+                            <rect x="16" y="30" width="3" height="8" rx="1.5" fill="#d4af37"/>
+                            <rect x="12" y="34" width="11" height="3" rx="1.5" fill="#d4af37"/>
+                            <circle cx="44" cy="30" r="2.5" fill="#f0d060"/>
+                            <circle cx="50" cy="34" r="2.5" fill="#f0d060"/>
+                            <circle cx="44" cy="38" r="2.5" fill="#f0d060"/>
+                            <circle cx="38" cy="34" r="2.5" fill="#f0d060"/>
+                            <ellipse cx="24" cy="44" rx="5" ry="3" fill="#1a5c38"/>
+                            <ellipse cx="40" cy="44" rx="5" ry="3" fill="#1a5c38"/>
+                        </svg>
+                    </div>
+                    <p class="item-titulo">Juegos</p>
+                    <p class="item-desc">Sobre plantas y rituales</p>
+                    <div class="item-brillo"></div>
+                </a>
+
+                <a href="ranking.html" class="menu-item item-ranking" id="itemRanking">
+                    <div class="item-icono">
+                        <svg viewBox="0 0 64 64" fill="none">
+                            <path d="M20 10h24v18c0 8-5 14-12 16C25 42 20 36 20 28V10z" fill="#d4af37" stroke="#f0d060" stroke-width="1.5"/>
+                            <path d="M8 14h12v10c0 4-2 7-6 8C10 31 8 28 8 24v-10z" fill="#c49a00" stroke="#d4af37" stroke-width="1"/>
+                            <path d="M44 14h12v10c0 4-2 7-6 8C46 31 44 28 44 24v-10z" fill="#c49a00" stroke="#d4af37" stroke-width="1"/>
+                            <rect x="27" y="44" width="10" height="6" rx="1" fill="#d4af37"/>
+                            <rect x="20" y="50" width="24" height="4" rx="2" fill="#c49a00"/>
+                            <circle cx="32" cy="26" r="5" fill="#fff9c0"/>
+                            <text x="32" y="30" text-anchor="middle" font-size="7" fill="#8b6900" font-weight="bold">1</text>
+                        </svg>
+                    </div>
+                    <p class="item-titulo">Ranking</p>
+                    <p class="item-desc">Tabla de posiciones</p>
+                    <div class="item-brillo"></div>
+                </a>
+
+                <a href="creditos.html" class="menu-item item-creditos" id="itemCreditos">
+                    <div class="item-icono">
+                        <svg viewBox="0 0 64 64" fill="none">
+                            <circle cx="32" cy="32" r="24" fill="#2d6b4a" stroke="#d4af37" stroke-width="2"/>
+                            <circle cx="32" cy="20" r="3.5" fill="#f0d060"/>
+                            <rect x="28.5" y="27" width="7" height="18" rx="3.5" fill="#f0d060"/>
+                        </svg>
+                    </div>
+                    <p class="item-titulo">Créditos</p>
+                    <p class="item-desc">Información del proyecto</p>
+                    <div class="item-brillo"></div>
+                </a>
+
+                <a href="profile.html" class="menu-item item-perfil" id="itemPerfil">
+                    <div class="item-icono">
+                        <svg viewBox="0 0 64 64" fill="none">
+                            <circle cx="32" cy="22" r="12" fill="#2d8b4a" stroke="#d4af37" stroke-width="2"/>
+                            <path d="M10 52c0-12 9-20 22-20s22 8 22 20" stroke="#d4af37" stroke-width="2.5" stroke-linecap="round" fill="#1a5c38"/>
+                            <circle cx="32" cy="22" r="6" fill="#f0d060" opacity="0.4"/>
+                        </svg>
+                    </div>
+                    <p class="item-titulo">Mi Perfil</p>
+                    <p class="item-desc">Ver y editar tu cuenta</p>
+                    <div class="item-brillo"></div>
+                </a>
+
+                <button class="menu-item item-cerrar" id="btnCerrarSesion" type="button">
+                    <div class="item-icono">
+                        <svg viewBox="0 0 64 64" fill="none">
+                            <rect x="10" y="10" width="28" height="44" rx="3" fill="#c0392b" stroke="#e74c3c" stroke-width="1.5"/>
+                            <rect x="14" y="14" width="20" height="36" rx="2" fill="#e74c3c" opacity="0.3"/>
+                            <circle cx="34" cy="33" r="2.5" fill="#fff"/>
+                            <path d="M40 25l12 7-12 7" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M36 32h16" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+                    <p class="item-titulo">Cerrar Sesión</p>
+                    <p class="item-desc">Salir de tu cuenta</p>
+                    <div class="item-brillo"></div>
+                </button>
+
+            </nav>
+        </div>
+    </main>
+
+    <!-- Modal cerrar sesión -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal-box" id="modalBox">
+            <p class="modal-icono">🌿</p>
+            <p class="modal-titulo">¿Cerrar sesión?</p>
+            <p class="modal-texto">El Taita guardará tu progreso antes de que partas.</p>
+            <div class="modal-botones">
+                <button class="modal-btn modal-cancelar" id="modalCancelar">Quedarse</button>
+                <button class="modal-btn modal-confirmar" id="modalConfirmar">Salir</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/menugeneral.js"></script>
+    <script src="../js/dialogos.js"></script>
+    <script>
+        window.addEventListener('load', () => {
+            const mundo1Completo = localStorage.getItem('mundo1_completo');
+            const id = mundo1Completo ? 'menu_mundo1_completo' : 'menu_bienvenida';
+            DialogoSistema.mostrarConDelay(id, 1000);
+        });
+    </script>
+</body>
+</html>

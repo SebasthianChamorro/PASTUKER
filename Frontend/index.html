@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#1a4a2e">
+    <title>Pastuker — Fortalecimiento Cultural Pastos</title>
+    <link rel="manifest" href="./manifest.json">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/index.css">
+    <link rel="stylesheet" href="css/dialogos.css">
+</head>
+<body>
+
+    <!-- ESCENA DE FONDO -->
+    <div class="escena" aria-hidden="true">
+        <div class="cielo"></div>
+        <img src="images/landscale/sun.png" alt="" class="sol-img">
+        <img src="images/landscale/clouds.png"   alt="" class="nube-img nube-i1">
+        <img src="images/landscale/clouds_2.png" alt="" class="nube-img nube-i2">
+        <img src="images/landscale/cloud_3.png"  alt="" class="nube-img nube-i3">
+        <img src="images/landscale/clouds.png"   alt="" class="nube-img nube-i4">
+        <img src="images/landscale/clouds_2.png" alt="" class="nube-img nube-i5">
+        <img src="images/landscale/birds.png" alt="" class="aves aves-1">
+        <img src="images/landscale/birds.png" alt="" class="aves aves-2">
+        <div class="montanas-fondo">
+            <img src="images/landscale/mountain.png" class="montana-img mt-1" alt="">
+            <img src="images/landscale/mountain.png" class="montana-img mt-2" alt="">
+            <img src="images/landscale/mountain.png" class="montana-img mt-3" alt="">
+            <img src="images/landscale/mountain.png" class="montana-img mt-4" alt="">
+            <img src="images/landscale/mountain.png" class="montana-img mt-5" alt="">
+            <img src="images/landscale/mountain.png" class="montana-img mt-6" alt="">
+        </div>
+        <div class="capa-fondo">
+            <img src="images/landscale/tree_2.png"   class="arbol-fondo af-1"  alt="">
+            <img src="images/landscale/tree.png"     class="arbol-fondo af-2"  alt="">
+            <img src="images/landscale/tree_3.png"   class="arbol-fondo af-3"  alt="">
+            <img src="images/landscale/tree_2.png"   class="arbol-fondo af-4"  alt="">
+            <img src="images/landscale/tree.png"     class="arbol-fondo af-5"  alt="">
+            <img src="images/landscale/tree_3.png"   class="arbol-fondo af-6"  alt="">
+            <img src="images/landscale/tree.png"     class="arbol-fondo af-7"  alt="">
+            <img src="images/landscale/tree_2.png"   class="arbol-fondo af-8"  alt="">
+            <img src="images/landscale/tree_3.png"   class="arbol-fondo af-9"  alt="">
+            <img src="images/landscale/tree.png"     class="arbol-fondo af-10" alt="">
+        </div>
+        <div class="capa-media">
+            <img src="images/landscale/tree_3.png"  class="arbol-medio am-1"  alt="">
+            <img src="images/landscale/tree.png"    class="arbol-medio am-2"  alt="">
+            <img src="images/landscale/tree_2.png"  class="arbol-medio am-3"  alt="">
+            <img src="images/landscale/tree_3.png"  class="arbol-medio am-4"  alt="">
+            <img src="images/landscale/tree.png"    class="arbol-medio am-5"  alt="">
+            <img src="images/landscale/tree_2.png"  class="arbol-medio am-6"  alt="">
+            <img src="images/landscale/tree_3.png"  class="arbol-medio am-7"  alt="">
+            <img src="images/landscale/tree.png"    class="arbol-medio am-8"  alt="">
+            <img src="images/landscale/tree_2.png"  class="arbol-medio am-9"  alt="">
+            <img src="images/landscale/tree_3.png"  class="arbol-medio am-10" alt="">
+        </div>
+        <div class="capa-frente">
+            <img src="images/landscale/tree_3.png"  class="arbol-frente af-f1"  alt="">
+            <img src="images/landscale/tree.png"    class="arbol-frente af-f2"  alt="">
+            <img src="images/landscale/tree_2.png"  class="arbol-frente af-f3"  alt="">
+            <img src="images/landscale/tree_3.png"  class="arbol-frente af-f4"  alt="">
+            <img src="images/landscale/tree.png"    class="arbol-frente af-f5"  alt="">
+            <img src="images/landscale/tree_2.png"  class="arbol-frente af-f6"  alt="">
+            <img src="images/landscale/tree_3.png"  class="arbol-frente af-f7"  alt="">
+            <img src="images/landscale/tree.png"    class="arbol-frente af-f8"  alt="">
+            <img src="images/landscale/tree_2.png"  class="arbol-frente af-f9"  alt="">
+            <img src="images/landscale/tree_3.png"  class="arbol-frente af-f10" alt="">
+        </div>
+        <div class="capa-arbustos">
+            <img src="images/landscale/bush.png"    class="arbusto ab-1"  alt="">
+            <img src="images/landscale/bush_2.png"  class="arbusto ab-2"  alt="">
+            <img src="images/landscale/bush.png"    class="arbusto ab-3"  alt="">
+            <img src="images/landscale/bush_2.png"  class="arbusto ab-4"  alt="">
+            <img src="images/landscale/bush.png"    class="arbusto ab-5"  alt="">
+            <img src="images/landscale/bush_2.png"  class="arbusto ab-6"  alt="">
+            <img src="images/landscale/bush_2.png"  class="arbusto ab-7"  alt="">
+            <img src="images/landscale/bush.png"    class="arbusto ab-8"  alt="">
+            <img src="images/landscale/bush_2.png"  class="arbusto ab-9"  alt="">
+            <img src="images/landscale/bush.png"    class="arbusto ab-10" alt="">
+        </div>
+        <div class="suelo-hierba"></div>
+        <div class="suelo-tierra"></div>
+        <div class="particulas">
+            <div class="particula p-1"></div>
+            <div class="particula p-2"></div>
+            <div class="particula p-3"></div>
+            <div class="particula p-4"></div>
+            <div class="particula p-5"></div>
+            <div class="particula p-6"></div>
+            <div class="particula p-7"></div>
+            <div class="particula p-8"></div>
+        </div>
+    </div>
+
+    <main class="contenido-principal">
+        <aside class="lateral lateral-izq" aria-hidden="true">
+            <img src="images/landscale/maloca.png" alt="Maloca ancestral Pastos" class="lateral-maloca-img">
+        </aside>
+
+        <!-- ── TARJETA CENTRAL ── -->
+        <div class="tarjeta-inicio">
+
+            <div class="logos-institucionales">
+                <div class="logo-circulo">
+                    <img src="images/logos/logo_universidad.png" alt="Universidad"
+                         onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+                    <span class="logo-placeholder" style="display:none">🏛️</span>
+                </div>
+                <div class="separador-logos"></div>
+                <div class="logo-circulo">
+                    <img src="images/logos/logo_cabildo.png" alt="Cabildo Chapal"
+                         onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+                    <span class="logo-placeholder" style="display:none">🌿</span>
+                </div>
+            </div>
+
+            <div class="encabezado">
+                <p class="etiqueta-proyecto">BIENVENIDOS A</p>
+                <h1 class="titulo-principal">PASTUKER</h1>
+                <div class="decoracion-titulo">
+                    <span class="linea-deco"></span>
+                    <span class="icono-deco">✦</span>
+                    <span class="linea-deco"></span>
+                </div>
+                <p class="subtitulo">Fortalecimiento de Identidad Cultural</p>
+            </div>
+
+            <p class="descripcion">
+                Videojuego educativo para fortalecer el conocimiento ancestral del
+                <strong>Pueblo Pasto</strong>, fortaleciendo la identidad cultural
+                de los jóvenes indígenas de la Parcialidad de Chapal perteneciente
+                al Resguardo indígena de Funes.
+            </p>
+
+            <!-- Taita Lorenzo — burbuja manejada por dialogos.js -->
+            <div class="taita-contenedor">
+                <div class="taita-dos-frames">
+                    <img src="images/taita/taita_frame1.png" class="taita-frame taita-f1" alt="">
+                    <img src="images/taita/taita_frame2.png" class="taita-frame taita-f2" alt="">
+                </div>
+                <div class="taita-info">
+                    <span class="taita-nombre">Taita Lorenzo</span>
+                    <span class="taita-titulo">Sabedor Ancestral · Guía del Bosque</span>
+                </div>
+            </div>
+
+            <div class="botones-accion">
+                <a href="pages/menugeneral.html" class="btn btn-jugar">
+                    <span class="btn-icono">▶</span>
+                    <span class="btn-texto">Jugar Ahora</span>
+                    <span class="btn-sub">Sin necesidad de internet</span>
+                </a>
+                <div class="botones-cuenta">
+                    <a href="pages/login.html" class="btn btn-secundario">Iniciar Sesión</a>
+                    <a href="pages/register.html" class="btn btn-secundario btn-outline">Crear Cuenta</a>
+                </div>
+            </div>
+
+            <p class="nota-offline">
+                <span class="icono-wifi">📶</span>
+                Funciona 100% sin internet · Guarda tu progreso localmente
+            </p>
+        </div>
+
+        <aside class="lateral lateral-der" aria-hidden="true">
+            <img src="images/landscale/maloca.png" alt="Maloca Bosque Sagrado" class="lateral-maloca-img">
+        </aside>
+    </main>
+
+    <script src="js/index.js"></script>
+    <script src="js/dialogos.js"></script>
+    <script>
+        window.addEventListener('load', () => {
+            const yaVisito = localStorage.getItem('usuario_nombre');
+            const id = yaVisito ? 'index_regreso' : 'index_bienvenida';
+            DialogoSistema.mostrarConDelay(id, 1400);
+        });
+    </script>
+</body>
+</html>

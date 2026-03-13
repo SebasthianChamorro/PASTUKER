@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#1a4a2e">
+    <title>Pstuker — Bosque Sagrado</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/game.css">
+</head>
+<body>
+
+    <!-- ══ GIRAR DISPOSITIVO ══ -->
+    <div id="rotate-msg">
+        <span class="rot-ph">📱</span>
+        <p class="rot-txt">Gira tu dispositivo<br><br>El bosque necesita<br>modo horizontal</p>
+    </div>
+
+    <!-- ══ BOTÓN SALIR ══ -->
+    <a id="btn-salir" href="juegos.html">← Salir</a>
+
+    <!-- ══ HUD (izquierda) ══ -->
+    <div id="hud">
+        <div class="hud-box">
+            <div id="hud-txt">🌿 0 / 5 plantas</div>
+            <div class="hud-bar">
+                <div class="hud-bar-fill" id="hud-fill" style="width:0%"></div>
+            </div>
+        </div>
+        <button id="btn-quiz" onclick="iniciarQuiz()">⚡ Ir al Quiz</button>
+    </div>
+
+    <!-- ══ MINIMAPA (derecha) ══ -->
+    <div id="minimap-wrap">
+        <div id="minimap-title">MAPA DEL BOSQUE</div>
+        <canvas id="minimap" width="160" height="120"></canvas>
+        <div class="mm-legend">
+            <div class="mm-dot"><span style="background:#4fc3f7"></span>Tú</div>
+            <div class="mm-dot"><span style="background:#d4af37"></span>Taita</div>
+            <div class="mm-dot"><span style="background:#81c784"></span>Planta</div>
+            <div class="mm-dot"><span style="background:#ef9a9a"></span>Recog.</div>
+        </div>
+    </div>
+
+    <!-- ══ D-PAD ══ -->
+    <div id="dpad">
+        <div class="dp" id="dp-up">▲</div>
+        <div class="dp" id="dp-down">▼</div>
+        <div class="dp" id="dp-left">◄</div>
+        <div class="dp" id="dp-right">►</div>
+        <div class="dp-c"></div>
+    </div>
+
+    <!-- ══ BOTÓN RECOGER ══ -->
+    <div id="btn-act" onclick="interactuar()">
+        <span class="act-ico">🖐️</span>
+        <span>Recoger</span>
+    </div>
+
+    <!-- ══ BURBUJA TAITA ══ -->
+    <div id="burbuja"></div>
+
+    <!-- ══ CANVAS PHASER ══ -->
+    <div id="game-wrap">
+        <div id="game-container"></div>
+    </div>
+
+    <!-- ══ AVES VOLANDO ══ -->
+    <img src="../images/landscale/birds.png" alt="" class="aves aves-1">
+    <img src="../images/landscale/birds.png" alt="" class="aves aves-2">
+
+    <!-- ══ PANEL INFO PLANTA (split screen derecha) ══ -->
+    <div id="panel">
+        <div class="pp-box">
+            <!-- Imagen real de la planta (se inyecta por JS) -->
+            <span class="pp-ico" id="pp-ico"></span>
+            <p class="pp-nom" id="pp-nom">Nombre</p>
+            <!-- pp-ci oculto, el JS ya no lo rellena -->
+            <p class="pp-ci" id="pp-ci"></p>
+            <!-- Descripción breve ancestral — NUEVO -->
+            <p class="pp-desc" id="pp-desc"></p>
+        </div>
+        <div class="pp-data">
+            <div>
+                <p class="pd-lbl">Usos medicinales</p>
+                <p class="pd-val" id="pp-usos">—</p>
+            </div>
+            <div>
+                <p class="pd-lbl">Preparación</p>
+                <p class="pd-val" id="pp-prep">—</p>
+            </div>
+            <!-- Bloque "Saber ancestral Pastos" y pp-anc eliminados -->
+        </div>
+        <p class="pp-prog-txt" id="pp-ptxt">1/5 plantas</p>
+        <div class="pp-bar">
+            <div class="pp-bar-fill" id="pp-pfill" style="width:0%"></div>
+        </div>
+        <button class="btn-cont" onclick="cerrarPanel()">Continuar explorando →</button>
+    </div>
+
+    <!-- ══ QUIZ OVERLAY ══ -->
+    <div id="quiz-ov">
+        <div class="q-card">
+            <div class="qt">
+                <span class="qp" id="qprog">1/10</span>
+                <span class="qtim" id="qtim">15</span>
+            </div>
+            <div class="qb">
+                <div class="qbf" id="qbf" style="width:100%"></div>
+            </div>
+            <!-- Imagen de la planta en el quiz — NUEVO -->
+            <div class="q-planta-img" id="q-planta-img"></div>
+            <p class="qpreg" id="qpreg">…</p>
+            <div class="qopts" id="qopts"></div>
+        </div>
+    </div>
+
+    <!-- ══ RESULTADO OVERLAY ══ -->
+    <div id="res-ov">
+        <div class="rc">
+            <span class="re" id="re">🏆</span>
+            <p class="rt"    id="rt">Título</p>
+            <div class="rp"  id="rp">0/10</div>
+            <p class="rd"    id="rd">Descripción</p>
+            <div class="rbtns">
+                <button class="rbtn rbr" onclick="continuar()">Continuar →</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Motor de juego -->
+    <script src="../js/phaser.min.js"></script>
+
+    <!-- JS del juego -->
+    <script src="../js/game.js"></script>
+
+</body>
+</html>
