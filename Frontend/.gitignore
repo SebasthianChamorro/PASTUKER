@@ -1,0 +1,11 @@
+# Imágenes (56MB — guardar en Google Drive aparte)
+images/
+
+# Audio
+audio/
+
+# Sistema
+.DS_Store
+Thumbs.db
+*.log
+node_modules/
