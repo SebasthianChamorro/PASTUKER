@@ -10,10 +10,26 @@
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../css/profile.css">
     <link rel="stylesheet" href="../css/dialogos.css">
+    <style>
+        .stat-box-btn {
+            cursor: pointer;
+            transition: background .18s, transform .15s;
+        }
+        .stat-box-btn:hover  { background: rgba(45,107,74,.55); transform: translateY(-2px); }
+        .stat-box-btn:active { transform: translateY(0); }
+        .stat-ir {
+            display: block;
+            font-family: 'Press Start 2P', monospace;
+            font-size: clamp(6px, 1.2vw, 8px);
+            color: #7dbf8a;
+            margin-top: 5px;
+        }
+        .stat-box-pronto { cursor: default; opacity: .65; }
+        .stat-box-pronto:hover { transform: none !important; background: unset !important; }
+    </style>
 </head>
 <body>
 
-    <!-- ESCENA DE FONDO -->
     <div class="escena" aria-hidden="true">
         <div class="cielo"></div>
         <img src="../images/landscale/sun.png"      alt="" class="sol-img">
@@ -75,39 +91,29 @@
         <div class="suelo-hierba"></div>
         <div class="suelo-tierra"></div>
         <div class="particulas">
-            <div class="particula p-1"></div>
-            <div class="particula p-2"></div>
-            <div class="particula p-3"></div>
-            <div class="particula p-4"></div>
-            <div class="particula p-5"></div>
-            <div class="particula p-6"></div>
+            <div class="particula p-1"></div><div class="particula p-2"></div>
+            <div class="particula p-3"></div><div class="particula p-4"></div>
+            <div class="particula p-5"></div><div class="particula p-6"></div>
         </div>
     </div>
 
     <main class="contenido-principal">
         <div class="profile-card" id="profileCard">
 
-            <!-- ── ENCABEZADO ── -->
             <div class="profile-header">
                 <h1 class="profile-titulo">Mi Perfil</h1>
                 <p class="profile-subtitulo">Gestiona tu cuenta y avatar</p>
                 <div class="deco-linea">
-                    <span class="linea-deco"></span>
-                    <span class="icono-deco">✦</span>
-                    <span class="linea-deco"></span>
+                    <span class="linea-deco"></span><span class="icono-deco">✦</span><span class="linea-deco"></span>
                 </div>
             </div>
 
-            <!-- ── MAMA ROSA — burbuja hardcodeada eliminada, la maneja dialogos.js ── -->
             <div class="mama-en-card">
-
-                <!-- Botón regresar — primer hijo del contenedor de Mama -->
-                <a href="menugeneral.html" class="btn-regresar" aria-label="Regresar">
+                <a onclick="location.replace('menugeneral.html')" class="btn-regresar" aria-label="Regresar" style="cursor:pointer">
                     <svg viewBox="0 0 24 24" fill="none">
                         <path d="M19 12H5M5 12l7-7M5 12l7 7" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
                 </a>
-
                 <div class="mama-dos-frames">
                     <img src="../images/mama/mama_frame1.png" class="mama-frame mama-f1" alt="Mama Rosa">
                     <img src="../images/mama/mama_frame2.png" class="mama-frame mama-f2" alt="">
@@ -116,15 +122,14 @@
                 <p class="mama-titulo-npc">Sabia Ancestral · Guardiana de Rituales</p>
             </div>
 
-            <!-- ── AVATAR DEL USUARIO ── -->
             <div class="avatar-seccion">
                 <div class="avatar-ring">
                     <img id="avatarImg" src="" alt="Tu avatar" class="avatar-img">
                     <div class="avatar-ring-deco"></div>
                 </div>
-                <p class="usuario-nombre" id="displayNombre">Explorador</p>
+                <p class="usuario-nombre"   id="displayNombre">Explorador</p>
                 <p class="usuario-telefono" id="displayTelefono">---</p>
-                <button class="btn-editar-avatar" id="btnEditarAvatar" onclick="window.location.href='avatar-selector.html'">
+                <button class="btn-editar-avatar" onclick="window.location.href='avatar-selector.html'">
                     <svg viewBox="0 0 24 24" fill="none">
                         <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
                         <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
@@ -133,7 +138,6 @@
                 </button>
             </div>
 
-            <!-- ── SECCIONES ── -->
             <div class="secciones">
 
                 <!-- Cambiar nombre -->
@@ -158,9 +162,7 @@
                                 <input type="text" id="nuevoNombre" class="campo-input" placeholder="Ingresa tu nuevo nombre" maxlength="50">
                                 <span class="campo-error" id="errorNombre"></span>
                             </div>
-                            <button class="btn-guardar" id="btnGuardarNombre">
-                                <span>Guardar Cambios</span>
-                            </button>
+                            <button class="btn-guardar" id="btnGuardarNombre"><span>Guardar Cambios</span></button>
                         </div>
                     </div>
                 </div>
@@ -211,9 +213,7 @@
                                 </div>
                             </div>
                             <span class="campo-error" id="errorPass"></span>
-                            <button class="btn-guardar" id="btnGuardarPass">
-                                <span>Actualizar Contraseña</span>
-                            </button>
+                            <button class="btn-guardar" id="btnGuardarPass"><span>Actualizar Contraseña</span></button>
                         </div>
                     </div>
                 </div>
@@ -242,13 +242,17 @@
                                 <p class="stat-num" id="statPartidas">0</p>
                                 <p class="stat-etiq">Partidas jugadas</p>
                             </div>
-                            <div class="stat-box">
-                                <p class="stat-num" id="statAciertos">0%</p>
-                                <p class="stat-etiq">% de aciertos</p>
+                            <!-- Plantas → inventario.html -->
+                            <div class="stat-box stat-box-btn" onclick="window.location.href='inventario.html'">
+                                <p class="stat-num" id="statPlantas">0</p>
+                                <p class="stat-etiq">Plantas encontradas</p>
+                                <span class="stat-ir">Ver inventario →</span>
                             </div>
-                            <div class="stat-box">
-                                <p class="stat-num" id="statRanking">#—</p>
-                                <p class="stat-etiq">Posición global</p>
+                            <!-- Logros → próximamente -->
+                            <div class="stat-box stat-box-btn stat-box-pronto">
+                                <p class="stat-num">🏆</p>
+                                <p class="stat-etiq">Logros</p>
+                                <span class="stat-ir">Próximamente</span>
                             </div>
                         </div>
                     </div>
@@ -277,13 +281,11 @@
         </div>
     </main>
 
-    <!-- Toast -->
     <div class="toast" id="toast">
         <span class="toast-icono">✓</span>
         <span id="toastMsg">Cambios guardados</span>
     </div>
 
-    <!-- Modal eliminar cuenta -->
     <div class="modal-overlay" id="modalEliminar">
         <div class="modal-box" id="modalBox">
             <p class="modal-icono">⚠️</p>
@@ -300,7 +302,16 @@
         </div>
     </div>
 
+    <!-- plantas_catalogo primero para que statPlantas funcione -->
+    <script src="../js/plantas_catalogo.js"></script>
+    <script>history.replaceState(null, '', location.href);</script>
     <script src="../js/profile.js"></script>
+    <script>
+        // Mostrar conteo de plantas encontradas en el stat-box
+        const _ids = JSON.parse(localStorage.getItem('plantas_encontradas') || '[]');
+        const _el  = document.getElementById('statPlantas');
+        if (_el) _el.textContent = _ids.length;
+    </script>
     <script src="../js/dialogos.js"></script>
     <script>
         window.addEventListener('load', () => {

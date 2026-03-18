@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <meta name="theme-color" content="#1a4a2e">
+    <title>Pastuker — Inventario de Plantas</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(160deg, #0c2316 0%, #1a4a2e 60%, #0e3020 100%);
+            font-family: 'Nunito', sans-serif;
+            color: #e8f5e9;
+            overflow-x: hidden;
+        }
+
+        /* ── Header ── */
+        .inv-header {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            background: rgba(10,28,18,.95);
+            backdrop-filter: blur(8px);
+            border-bottom: 1px solid rgba(212,175,55,.2);
+            padding: 14px 20px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+        .inv-back {
+            width: 38px; height: 38px;
+            border-radius: 8px;
+            background: rgba(45,107,74,.5);
+            border: 1.5px solid rgba(212,175,55,.3);
+            color: #d4af37;
+            font-size: 18px;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer;
+            text-decoration: none;
+            flex-shrink: 0;
+            transition: background .18s;
+        }
+        .inv-back:hover { background: rgba(45,107,74,.85); }
+        .inv-titulo {
+            font-family: 'Press Start 2P', monospace;
+            font-size: clamp(9px, 2vw, 13px);
+            color: #d4af37;
+            line-height: 1.4;
+        }
+        .inv-subtitulo {
+            font-size: clamp(10px, 1.8vw, 13px);
+            color: rgba(255,255,255,.55);
+            margin-top: 2px;
+        }
+        .inv-contador {
+            margin-left: auto;
+            font-family: 'Press Start 2P', monospace;
+            font-size: clamp(8px, 1.6vw, 11px);
+            color: #7dbf8a;
+            white-space: nowrap;
+        }
+
+        /* ── Grid ── */
+        .inv-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(min(130px, 28vw), 1fr));
+            gap: clamp(10px, 2.5vw, 18px);
+            padding: clamp(16px, 4vw, 28px);
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        /* ── Tarjeta planta ── */
+        .planta-card {
+            background: rgba(22,60,38,.8);
+            border: 1.5px solid rgba(45,107,74,.6);
+            border-radius: 12px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform .18s, border-color .18s, box-shadow .18s;
+            position: relative;
+        }
+        .planta-card:hover {
+            transform: translateY(-4px);
+            border-color: #d4af37;
+            box-shadow: 0 8px 24px rgba(0,0,0,.4);
+        }
+        .planta-card.bloqueada {
+            cursor: default;
+            opacity: .55;
+            filter: grayscale(.8);
+        }
+        .planta-card.bloqueada:hover { transform: none; border-color: rgba(45,107,74,.6); box-shadow: none; }
+
+        .planta-img-wrap {
+            width: 100%;
+            aspect-ratio: 1;
+            background: rgba(12,35,22,.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        .planta-img-wrap img {
+            width: 75%;
+            height: 75%;
+            object-fit: contain;
+        }
+        .planta-lock {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -60%);
+            font-size: clamp(22px, 5vw, 32px);
+            pointer-events: none;
+        }
+        .planta-nombre {
+            padding: 8px 10px;
+            font-family: 'Press Start 2P', monospace;
+            font-size: clamp(6px, 1.3vw, 8px);
+            color: #d4af37;
+            text-align: center;
+            line-height: 1.5;
+        }
+        .planta-card.bloqueada .planta-nombre { color: rgba(255,255,255,.35); }
+
+        /* Badge "nueva" */
+        .badge-nueva {
+            position: absolute;
+            top: 7px; right: 7px;
+            background: #d4af37;
+            color: #0c2316;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 6px;
+            padding: 3px 5px;
+            border-radius: 4px;
+        }
+
+        /* ── Modal detalle ── */
+        .modal-overlay {
+            position: fixed; inset: 0; z-index: 200;
+            background: rgba(0,0,0,.82);
+            display: flex; align-items: center; justify-content: center;
+            padding: 20px;
+            opacity: 0; pointer-events: none;
+            transition: opacity .28s;
+        }
+        .modal-overlay.on { opacity: 1; pointer-events: all; }
+
+        .modal-box {
+            width: min(92vw, 460px);
+            max-height: 88vh;
+            overflow-y: auto;
+            background: linear-gradient(160deg, #0c2316, #1a4a2e);
+            border: 2px solid #2d6b4a;
+            border-radius: 16px;
+            box-shadow: 0 16px 48px rgba(0,0,0,.6);
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+            transform: scale(.94);
+            transition: transform .28s;
+        }
+        .modal-overlay.on .modal-box { transform: scale(1); }
+
+        .modal-img {
+            width: 100%;
+            aspect-ratio: 4/3;
+            object-fit: cover;
+            border-radius: 14px 14px 0 0;
+        }
+        .modal-body { padding: clamp(16px, 3vw, 24px); display: flex; flex-direction: column; gap: 12px; }
+
+        .modal-nombre {
+            font-family: 'Press Start 2P', monospace;
+            font-size: clamp(10px, 2.2vw, 14px);
+            color: #d4af37;
+            line-height: 1.45;
+        }
+        .modal-label {
+            font-family: 'Press Start 2P', monospace;
+            font-size: clamp(7px, 1.4vw, 9px);
+            color: #7dbf8a;
+            text-transform: uppercase;
+            letter-spacing: .05em;
+            margin-top: 4px;
+        }
+        .modal-val {
+            font-size: clamp(12px, 2vw, 14px);
+            color: rgba(255,255,255,.85);
+            line-height: 1.55;
+        }
+        .modal-cerrar {
+            margin-top: 4px;
+            padding: clamp(10px, 2vw, 14px);
+            background: rgba(45,107,74,.5);
+            border: 1.5px solid #d4af37;
+            border-radius: 8px;
+            color: #d4af37;
+            font-family: 'Press Start 2P', monospace;
+            font-size: clamp(8px, 1.6vw, 10px);
+            cursor: pointer;
+            transition: background .18s;
+        }
+        .modal-cerrar:hover { background: rgba(45,107,74,.85); }
+
+        /* ── Estado vacío ── */
+        .inv-vacio {
+            text-align: center;
+            padding: 60px 20px;
+            opacity: .6;
+        }
+        .inv-vacio-ico { font-size: 48px; margin-bottom: 16px; }
+        .inv-vacio p {
+            font-family: 'Press Start 2P', monospace;
+            font-size: clamp(8px, 1.8vw, 11px);
+            color: rgba(255,255,255,.55);
+            line-height: 1.8;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header class="inv-header">
+        <a onclick="location.replace('profile.html')" class="inv-back" style="cursor:pointer">←</a>
+        <div>
+            <p class="inv-titulo">Inventario de Plantas</p>
+            <p class="inv-subtitulo">Plantas ancestrales del territorio Pasto</p>
+        </div>
+        <p class="inv-contador" id="contador">0 / 30</p>
+    </header>
+
+    <!-- Grid -->
+    <div class="inv-grid" id="invGrid"></div>
+
+    <!-- Modal detalle -->
+    <div class="modal-overlay" id="modalDetalle">
+        <div class="modal-box">
+            <img class="modal-img" id="modalImg" src="" alt="">
+            <div class="modal-body">
+                <p class="modal-nombre"  id="modalNombre">—</p>
+                <p class="modal-label">Descripción</p>
+                <p class="modal-val"    id="modalDesc">—</p>
+                <p class="modal-label">Usos medicinales</p>
+                <p class="modal-val"    id="modalUsos">—</p>
+                <p class="modal-label">Preparación</p>
+                <p class="modal-val"    id="modalPrep">—</p>
+                <button class="modal-cerrar" id="modalCerrar">← Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/plantas_catalogo.js"></script>
+    <script>
+        // Reemplaza la entrada actual del historial → el botón atrás del navegador
+        // no vuelve a esta página sino a la anterior en la ruta real
+        history.replaceState(null, '', location.href);
+        const encontradas = new Set(
+            JSON.parse(localStorage.getItem('plantas_encontradas') || '[]')
+        );
+
+        const grid      = document.getElementById('invGrid');
+        const contador  = document.getElementById('contador');
+        const modal     = document.getElementById('modalDetalle');
+        const modalImg  = document.getElementById('modalImg');
+        const modalNom  = document.getElementById('modalNombre');
+        const modalDesc = document.getElementById('modalDesc');
+        const modalUsos = document.getElementById('modalUsos');
+        const modalPrep = document.getElementById('modalPrep');
+
+        contador.textContent = `${encontradas.size} / ${window.PLANTAS_CATALOGO.length}`;
+
+        // Ordenar: encontradas primero, luego bloqueadas
+        const ordenadas = [...window.PLANTAS_CATALOGO].sort((a, b) => {
+            const aE = encontradas.has(a.id);
+            const bE = encontradas.has(b.id);
+            if (aE && !bE) return -1;
+            if (!aE && bE) return  1;
+            return a.nombre.localeCompare(b.nombre);
+        });
+
+        if (ordenadas.length === 0) {
+            grid.innerHTML = `<div class="inv-vacio" style="grid-column:1/-1">
+                <div class="inv-vacio-ico">🌱</div>
+                <p>Aún no has encontrado plantas.<br>¡Explora el Bosque Sagrado!</p>
+            </div>`;
+        }
+
+        ordenadas.forEach(p => {
+            const desbloqueada = encontradas.has(p.id);
+            const card = document.createElement('div');
+            card.className = 'planta-card' + (desbloqueada ? '' : ' bloqueada');
+            card.innerHTML = `
+                <div class="planta-img-wrap">
+                    <img src="${p.img}" alt="${p.nombre}" loading="lazy">
+                    ${!desbloqueada ? '<div class="planta-lock">🔒</div>' : ''}
+                </div>
+                <p class="planta-nombre">${desbloqueada ? p.nombre : '???'}</p>
+            `;
+
+            if (desbloqueada) {
+                card.addEventListener('click', () => abrirModal(p));
+            }
+            grid.appendChild(card);
+        });
+
+        function abrirModal(p) {
+            modalImg.src      = p.img;
+            modalImg.alt      = p.nombre;
+            modalNom.textContent  = p.nombre;
+            modalDesc.textContent = p.desc;
+            modalUsos.textContent = p.usos;
+            modalPrep.textContent = p.prep;
+            modal.classList.add('on');
+        }
+
+        document.getElementById('modalCerrar').addEventListener('click', () => {
+            modal.classList.remove('on');
+        });
+        modal.addEventListener('click', e => {
+            if (e.target === modal) modal.classList.remove('on');
+        });
+    </script>
+</body>
+</html>

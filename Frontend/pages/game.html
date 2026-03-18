@@ -103,14 +103,12 @@
     <div id="quiz-ov">
         <div class="q-card">
             <div class="qt">
-                <span class="qp" id="qprog">1/10</span>
+                <span class="qp"   id="qprog">1/10</span>
                 <span class="qtim" id="qtim">15</span>
             </div>
             <div class="qb">
                 <div class="qbf" id="qbf" style="width:100%"></div>
             </div>
-            <!-- Imagen de la planta en el quiz — NUEVO -->
-            <div class="q-planta-img" id="q-planta-img"></div>
             <p class="qpreg" id="qpreg">…</p>
             <div class="qopts" id="qopts"></div>
         </div>
@@ -129,10 +127,14 @@
         </div>
     </div>
 
-    <!-- Motor de juego -->
+    <!-- ══ SCRIPTS ══
+         ⚠️ El orden importa:
+         1. plantas_catalogo.js  — define window.PLANTAS_CATALOGO
+         2. phaser.min.js        — motor de juego
+         3. game.js              — usa PLANTAS_CATALOGO y Phaser
+    ══ -->
+    <script src="../js/plantas_catalogo.js"></script>
     <script src="../js/phaser.min.js"></script>
-
-    <!-- JS del juego -->
     <script src="../js/game.js"></script>
 
 </body>
