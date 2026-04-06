@@ -1,4 +1,4 @@
-/* ════════ PSTUKER — Bosque Sagrado · Top-down v3 ════════════ */
+/* ════════ PASTUKER — Bosque Sagrado · Top-down v3 ════════════ */
 const MAP_W=5600,MAP_H=4200,SPD=200,PROX_PLANTA=80,PROX_TAITA=120,PLANTAS_META=5;
 const TAITA_X=MAP_W/2,TAITA_Y=MAP_H/2;
 const MM_W=160,MM_H=120;
@@ -11,6 +11,9 @@ let qIdx=0,qPts=0,qPregs=[],qSeg=15,qInt=null;
 let playerWorldX=300,playerWorldY=MAP_H-300;
 let taitaParpadeo=false;
 let _mmTick=0;
+
+/* ── Volumen global (0.0 - 1.0) controlado desde el pause ── */
+let _volumen = 0.5;
 
 function dibujarMinimap(px,py,plantaObjs){
     const scaleX=MM_W/MAP_W,scaleY=MM_H/MAP_H;
@@ -40,6 +43,8 @@ class PreloadScene extends Phaser.Scene{
         this.add.rectangle(W/2,H/2+40,240,10,0x1a4a2e).setStrokeStyle(1,0xd4af37,.3);
         this.add.text(W/2,H/2+15,'Preparando el Bosque Sagrado...',{fontFamily:"'Press Start 2P'",fontSize:'9px',color:'#f0d060'}).setOrigin(.5);
         this.load.on('progress',v=>{this._bar.width=240*v});
+
+        // ── Imágenes ──
         this.load.image('tree','../images/landscale/tree.png');
         this.load.image('tree2','../images/landscale/tree_2.png');
         this.load.image('tree3','../images/landscale/tree_3.png');
@@ -50,25 +55,27 @@ class PreloadScene extends Phaser.Scene{
         this.load.image('taita_f1','../images/taita/taita_frame1.png');
         this.load.image('taita_f2','../images/taita/taita_frame2.png');
         this.load.image('bird','../images/landscale/birds.png');
-        // masculino
         ['default','left1','left2','left3','right1','right2','right3','down1','down2','down3','arrive1','arrive2','arrive3']
         .forEach(f=>this.load.image('walk_'+f,'../images/game/walk-men/walk-'+f+'.png'));
-        // femenino
         ['default','left1','left2','left3','right1','right2','down1','down2','down3','arrive1','arrive2','arrive3']
         .forEach(f=>this.load.image('walk2_'+f,'../images/game/walk-woman/walk2-'+f+'.png'));
-        // taita caminando
         this.load.image('taita-cam1','../images/taita/taita-caminando1.png');
         this.load.image('taita-cam2','../images/taita/taita-caminando2.png');
-        // jugador portal masculino
         this.load.image('walk-right1','../images/game/walk-men/walk-right1.png');
         this.load.image('walk-right2','../images/game/walk-men/walk-right2.png');
         this.load.image('walk-right3','../images/game/walk-men/walk-right3.png');
-        // jugador portal femenino
         this.load.image('walk2-right1','../images/game/walk-woman/walk2-right1.png');
         this.load.image('walk2-right2','../images/game/walk-woman/walk2-right2.png');
-        // portal
         for(let i=1;i<=15;i++){const k='portal'+String(i).padStart(2,'0');this.load.image(k,'../images/game/portal/'+k+'.png');}
         PLANTAS_CATALOGO.forEach(p=>this.load.image('planta_'+p.id,p.img));
+
+        // ── Audio ──
+        this.load.audio('forest_loop',  '../audio/music/forest_loop.mp3');
+        this.load.audio('sfx_planta',   '../audio/sfx/recoger_planta.wav');
+        this.load.audio('sfx_correcto', '../audio/sfx/correct_answer.wav');
+        this.load.audio('sfx_incorrecto','../audio/sfx/wrong_answer.ogg');
+        this.load.audio('sfx_portal',   '../audio/sfx/portal.ogg');
+        this.load.audio('sfx_nivel',    '../audio/sfx/level_complete.wav');
     }
     create(){this.scene.start('World')}
 }
@@ -94,7 +101,17 @@ class WorldScene extends Phaser.Scene{
         this.physics.add.collider(this.pl,this.bordeGrp);
         this.cameras.main.startFollow(this.pl,true,.09,.09);
         this._input();
+
+        // ── Música de fondo en loop ──
+        this._musica = this.sound.add('forest_loop', { loop: true, volume: _volumen * 0.6 });
+        this._musica.play();
     }
+
+    // ── Helper: reproducir SFX con volumen global ──
+    _sfx(key, vol=1.0){
+        this.sound.play(key, { volume: _volumen * vol });
+    }
+
     _suelo(){
         const g=this.add.graphics().setDepth(0);
         g.fillStyle(0x276132,1);g.fillRect(0,0,MAP_W,MAP_H);
@@ -179,8 +196,12 @@ class WorldScene extends Phaser.Scene{
         this._tx=tx;this._ty=ty;
     }
     _secuenciaPortal(){
+        // ── Sonido portal + bajar música ──
+        if(this._musica) this.tweens.add({targets:this._musica,volume:0,duration:2000});
+        this._sfx('sfx_portal', 0.9);
+
         const PX=TAITA_X+320,PY=TAITA_Y;
-        const FP=Array.from({length:15},(_,i)=>'portal'+String(i+1).padStart(2,'0'));
+        const FP=Array.from({length:15},(_,i)=>'portal'+String(i+1).padStart(2,'00'));
         const portal=this.add.sprite(PX,PY,'portal01').setDepth(12).setScale(2).setAlpha(0).setDisplaySize(120,180);
         let pIdx=0;this.time.addEvent({delay:60,callback:()=>{pIdx=(pIdx+1)%FP.length;portal.setTexture(FP[pIdx]);},loop:true});
         const TF=['taita-cam1','taita-cam2'];let tIdx=0;
@@ -271,7 +292,6 @@ class WorldScene extends Phaser.Scene{
         this._pobjs.forEach(o=>{if(o.spr.getData('rec'))return;const d=Phaser.Math.Distance.Between(px,py,o.spr.x,o.spr.y);if(d<min){near=o;min=d;}});
         if(near!==cercana){cercana=near;const b=document.getElementById('btn-act');near?b.classList.add('on'):b.classList.remove('on');}
     }
-    /* ── CAMBIO CLAVE: btn-quiz solo se activa al acercarse al Taita con 5 plantas ── */
     _chkTaita(px,py){
         const d=Phaser.Math.Distance.Between(px,py,this._tx,this._ty);
         const nc=d<PROX_TAITA;
@@ -303,15 +323,18 @@ function interactuar(){
     if(recolectadas.length>=PLANTAS_META)return;
     recolectadas.push(d);cercana=null;
     document.getElementById('btn-act').classList.remove('on');
-    // ── Guardar en localStorage para el inventario (offline) ──
     const _ids=new Set(JSON.parse(localStorage.getItem('plantas_encontradas')||'[]'));
     _ids.add(d.id);
     localStorage.setItem('plantas_encontradas',JSON.stringify([..._ids]));
-    const ws=game.scene.getScene('World');if(ws)ws.animRec(d.id);
+
+    // ── SFX recoger planta ──
+    const ws=game.scene.getScene('World');
+    if(ws) ws._sfx('sfx_planta', 0.8);
+    if(ws) ws.animRec(d.id);
+
     const n=recolectadas.length;
     document.getElementById('hud-txt').textContent='🌿 '+n+' / '+PLANTAS_META+' plantas';
     document.getElementById('hud-fill').style.width=Math.min(n/PLANTAS_META*100,100)+'%';
-    /* CAMBIO: NO se activa btn-quiz aquí — solo se activa el parpadeo del minimapa */
     if(n>=PLANTAS_META)taitaParpadeo=true;
     if(taitaCerca)_actualizarBurbuja();
     _abrirPanel(d,n);
@@ -376,27 +399,65 @@ function _resp(idx,correcto,btn){
     document.querySelectorAll('.qopt').forEach(b=>{b.disabled=true;b.style.pointerEvents='none';});
     const bots=document.getElementById('qopts').querySelectorAll('.qopt');
     if(bots[correcto]){bots[correcto].style.background='rgba(46,160,67,.85)';bots[correcto].style.borderColor='#2ea043';bots[correcto].style.color='#ffffff';}
-    if(idx===correcto){qPts++;if(btn){btn.style.background='rgba(46,160,67,.85)';btn.style.borderColor='#2ea043';}}
-    else if(idx>=0&&btn){btn.style.background='rgba(200,50,50,.85)';btn.style.borderColor='#c83232';btn.style.color='#ffffff';}
+
+    const ws=game.scene.getScene('World');
+    if(idx===correcto){
+        qPts++;
+        if(btn){btn.style.background='rgba(46,160,67,.85)';btn.style.borderColor='#2ea043';}
+        if(ws) ws._sfx('sfx_correcto', 0.8);  // ── SFX correcto ──
+    } else {
+        if(idx>=0&&btn){btn.style.background='rgba(200,50,50,.85)';btn.style.borderColor='#c83232';btn.style.color='#ffffff';}
+        if(ws) ws._sfx('sfx_incorrecto', 0.8); // ── SFX incorrecto ──
+    }
     setTimeout(()=>{qIdx++;_mostrarQ();},1500);
 }
 
 function _finQuiz(){
-    clearInterval(qInt);document.getElementById('quiz-ov').classList.remove('on');quizOn=false;
+    clearInterval(qInt);
+    document.getElementById('quiz-ov').classList.remove('on');
+    quizOn=false;
     const pct=qPts/10;let emo,tit,desc;
     if(pct>=.9){emo='🏆';tit='¡Guardián del Bosque!';desc='Conoces profundamente las plantas sagradas del territorio Pastos';}
     else if(pct>=.7){emo='🌿';tit='¡Buen Explorador!';desc='Tienes buen conocimiento del bosque sagrado';}
     else if(pct>=.5){emo='🌱';tit='Aprendiz del Bosque';desc='Sigue explorando y aprendiendo del territorio';}
     else{emo='🍂';tit='Sigue Intentando';desc='El bosque tiene mucho más por enseñarte';}
-    document.getElementById('re').textContent=emo;document.getElementById('rt').textContent=tit;
-    document.getElementById('rp').textContent=qPts+'/10';document.getElementById('rd').textContent=desc;
+    document.getElementById('re').textContent=emo;
+    document.getElementById('rt').textContent=tit;
+    document.getElementById('rp').textContent=qPts+'/10';
+    document.getElementById('rd').textContent=desc;
     document.getElementById('res-ov').classList.add('on');
     localStorage.setItem('puntos_total',(parseInt(localStorage.getItem('puntos_total')||'0')+qPts*10));
     localStorage.setItem('partidas',(parseInt(localStorage.getItem('partidas')||'0')+1));
+
+    // ── SFX nivel completo si puntaje >= 50% ──
+    const ws=game.scene.getScene('World');
+    if(ws && pct>=.5) ws._sfx('sfx_nivel', 0.9);
 }
 
-function continuar(){document.getElementById('res-ov').classList.remove('on');const ws=game.scene.getScene('World');if(ws)ws._secuenciaPortal();}
+function continuar(){
+    document.getElementById('res-ov').classList.remove('on');
+    const ws=game.scene.getScene('World');
+    if(ws)ws._secuenciaPortal();
+}
 function repetirQuiz(){document.getElementById('res-ov').classList.remove('on');iniciarQuiz();}
 function irMenu(){window.location.href='menugeneral.html';}
 
-const game=new Phaser.Game({type:Phaser.AUTO,parent:'game-container',width:window.innerWidth,height:window.innerHeight,backgroundColor:'#276132',physics:{default:'arcade',arcade:{gravity:{y:0},debug:false}},scene:[PreloadScene,WorldScene],scale:{mode:Phaser.Scale.RESIZE,autoCenter:Phaser.Scale.CENTER_BOTH}});
+/* ── Control de volumen desde el pause (si game.html tiene slider) ── */
+function cambiarVolumen(val){
+    _volumen = val / 100;
+    const ws = game.scene.getScene('World');
+    if(ws && ws._musica) ws._musica.setVolume(_volumen * 0.6);
+    const el = document.getElementById('volValor');
+    if(el) el.textContent = val + '%';
+}
+
+const game=new Phaser.Game({
+    type:Phaser.AUTO,
+    parent:'game-container',
+    width:window.innerWidth,
+    height:window.innerHeight,
+    backgroundColor:'#276132',
+    physics:{default:'arcade',arcade:{gravity:{y:0},debug:false}},
+    scene:[PreloadScene,WorldScene],
+    scale:{mode:Phaser.Scale.RESIZE,autoCenter:Phaser.Scale.CENTER_BOTH}
+});

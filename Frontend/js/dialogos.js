@@ -275,7 +275,7 @@ const DialogoSistema = (() => {
         _widget.style.display = 'flex';
         _escribirTexto(_textoCompleto);
 
-        const audioPath = opciones.audio || `${_audioBase}/${id}.mp3`;
+        const audioPath = opciones.audio || `${_audioBase}/${dialogo.personaje}/${id}.mp3`;
         _prepararAudio(audioPath);
     }
 
@@ -348,9 +348,13 @@ const DialogoSistema = (() => {
         if (btnAudio) btnAudio.style.display = 'none';
 
         _audioActual = new Audio(path);
-        _audioActual.onerror   = () => { /* silencioso */ };
-        _audioActual.oncanplay = () => {
-            if (btnAudio) btnAudio.style.display = 'flex';
+
+        // Mostrar botón inmediatamente — ocultarlo solo si falla
+        if (btnAudio) btnAudio.style.display = 'flex';
+
+        _audioActual.onerror = () => {
+            if (btnAudio) btnAudio.style.display = 'none';
+            _audioActual = null;
         };
         _audioActual.onended = () => {
             if (btnAudio) btnAudio.classList.remove('reproduciendo');

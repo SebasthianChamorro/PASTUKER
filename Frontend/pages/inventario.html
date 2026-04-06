@@ -4,12 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
     <meta name="theme-color" content="#1a4a2e">
-    <title>Pastuker — Inventario de Plantas</title>
+    <title>Pastuker — Inventario</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
         body {
             min-height: 100vh;
             background: linear-gradient(160deg, #0c2316 0%, #1a4a2e 60%, #0e3020 100%);
@@ -17,314 +16,387 @@
             color: #e8f5e9;
             overflow-x: hidden;
         }
-
         /* ── Header ── */
         .inv-header {
-            position: sticky;
-            top: 0;
-            z-index: 50;
+            position: sticky; top: 0; z-index: 50;
             background: rgba(10,28,18,.95);
             backdrop-filter: blur(8px);
             border-bottom: 1px solid rgba(212,175,55,.2);
             padding: 14px 20px;
-            display: flex;
-            align-items: center;
-            gap: 14px;
+            display: flex; align-items: center; gap: 14px;
         }
         .inv-back {
-            width: 38px; height: 38px;
-            border-radius: 8px;
+            width: 38px; height: 38px; border-radius: 8px;
             background: rgba(45,107,74,.5);
             border: 1.5px solid rgba(212,175,55,.3);
-            color: #d4af37;
-            font-size: 18px;
+            color: #d4af37; font-size: 18px;
             display: flex; align-items: center; justify-content: center;
-            cursor: pointer;
-            text-decoration: none;
-            flex-shrink: 0;
+            cursor: pointer; text-decoration: none; flex-shrink: 0;
             transition: background .18s;
         }
         .inv-back:hover { background: rgba(45,107,74,.85); }
         .inv-titulo {
             font-family: 'Press Start 2P', monospace;
             font-size: clamp(9px, 2vw, 13px);
-            color: #d4af37;
-            line-height: 1.4;
+            color: #d4af37; line-height: 1.4;
         }
         .inv-subtitulo {
             font-size: clamp(10px, 1.8vw, 13px);
-            color: rgba(255,255,255,.55);
-            margin-top: 2px;
+            color: rgba(255,255,255,.55); margin-top: 2px;
         }
-        .inv-contador {
-            margin-left: auto;
-            font-family: 'Press Start 2P', monospace;
-            font-size: clamp(8px, 1.6vw, 11px);
-            color: #7dbf8a;
-            white-space: nowrap;
-        }
-
-        /* ── Grid ── */
-        .inv-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(min(130px, 28vw), 1fr));
-            gap: clamp(10px, 2.5vw, 18px);
-            padding: clamp(16px, 4vw, 28px);
-            max-width: 900px;
+        /* ── Contenedor ── */
+        .inv-contenido {
+            max-width: 960px;
             margin: 0 auto;
+            padding: clamp(20px,4vw,36px) clamp(16px,4vw,28px) 56px;
+            display: flex; flex-direction: column; gap: 44px;
         }
-
-        /* ── Tarjeta planta ── */
+        /* ── Cabecera de sección ── */
+        .sec-header {
+            display: flex; align-items: center; gap: 12px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid rgba(212,175,55,.2);
+            margin-bottom: clamp(14px,3vw,22px);
+        }
+        .sec-ico { font-size: clamp(22px,4vw,30px); }
+        .sec-info { flex: 1; min-width: 0; }
+        .sec-titulo {
+            font-family: 'Press Start 2P', monospace;
+            font-size: clamp(8px,1.8vw,12px);
+            color: #d4af37; line-height: 1.5;
+        }
+        .sec-desc {
+            font-size: clamp(11px,1.8vw,13px);
+            color: rgba(255,255,255,.5); margin-top: 3px;
+        }
+        .sec-badge {
+            font-family: 'Press Start 2P', monospace;
+            font-size: clamp(7px,1.3vw,9px);
+            color: #7dbf8a; white-space: nowrap;
+            background: rgba(45,107,74,.4);
+            border: 1px solid rgba(125,191,138,.3);
+            padding: 5px 10px; border-radius: 6px;
+        }
+        /* ══ PLANTAS ══ */
+        .plantas-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(min(115px,25vw),1fr));
+            gap: clamp(10px,2.5vw,15px);
+        }
         .planta-card {
             background: rgba(22,60,38,.8);
             border: 1.5px solid rgba(45,107,74,.6);
-            border-radius: 12px;
-            overflow: hidden;
-            cursor: pointer;
+            border-radius: 12px; overflow: hidden;
+            cursor: pointer; position: relative;
             transition: transform .18s, border-color .18s, box-shadow .18s;
-            position: relative;
         }
-        .planta-card:hover {
-            transform: translateY(-4px);
-            border-color: #d4af37;
-            box-shadow: 0 8px 24px rgba(0,0,0,.4);
-        }
-        .planta-card.bloqueada {
-            cursor: default;
-            opacity: .55;
-            filter: grayscale(.8);
-        }
+        .planta-card:hover { transform: translateY(-4px); border-color: #d4af37; box-shadow: 0 8px 24px rgba(0,0,0,.4); }
+        .planta-card.bloqueada { cursor: default; opacity: .5; filter: grayscale(.85); }
         .planta-card.bloqueada:hover { transform: none; border-color: rgba(45,107,74,.6); box-shadow: none; }
-
         .planta-img-wrap {
-            width: 100%;
-            aspect-ratio: 1;
+            width: 100%; aspect-ratio: 1;
             background: rgba(12,35,22,.6);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
+            display: flex; align-items: center; justify-content: center; overflow: hidden;
         }
-        .planta-img-wrap img {
-            width: 75%;
-            height: 75%;
-            object-fit: contain;
-        }
+        .planta-img-wrap img { width: 75%; height: 75%; object-fit: contain; }
         .planta-lock {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -60%);
-            font-size: clamp(22px, 5vw, 32px);
-            pointer-events: none;
+            position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%,-60%);
+            font-size: clamp(20px,5vw,28px); pointer-events: none;
         }
         .planta-nombre {
-            padding: 8px 10px;
+            padding: 7px 8px;
             font-family: 'Press Start 2P', monospace;
-            font-size: clamp(6px, 1.3vw, 8px);
-            color: #d4af37;
-            text-align: center;
-            line-height: 1.5;
+            font-size: clamp(6px,1.2vw,8px);
+            color: #d4af37; text-align: center; line-height: 1.5;
         }
-        .planta-card.bloqueada .planta-nombre { color: rgba(255,255,255,.35); }
-
-        /* Badge "nueva" */
-        .badge-nueva {
-            position: absolute;
-            top: 7px; right: 7px;
-            background: #d4af37;
-            color: #0c2316;
+        .planta-card.bloqueada .planta-nombre { color: rgba(255,255,255,.28); }
+        .inv-vacio {
+            grid-column: 1/-1; text-align: center;
+            padding: 48px 20px; opacity: .6;
+        }
+        .inv-vacio-ico { font-size: 44px; margin-bottom: 14px; }
+        .inv-vacio p {
             font-family: 'Press Start 2P', monospace;
-            font-size: 6px;
-            padding: 3px 5px;
-            border-radius: 4px;
+            font-size: clamp(7px,1.5vw,10px);
+            color: rgba(255,255,255,.5); line-height: 2;
         }
-
-        /* ── Modal detalle ── */
+        /* ══ GEMAS ══ */
+        .gemas-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(min(260px,100%),1fr));
+            gap: clamp(10px,2.5vw,16px);
+        }
+        .nivel-card {
+            background: rgba(22,60,38,.65);
+            border: 1.5px solid rgba(45,107,74,.5);
+            border-radius: 12px;
+            padding: clamp(12px,2.5vw,18px);
+            display: flex; flex-direction: column; gap: 10px;
+        }
+        .nivel-card-top {
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .nivel-nombre {
+            font-family: 'Press Start 2P', monospace;
+            font-size: clamp(7px,1.4vw,9px); color: #f0d060;
+        }
+        .nivel-conteo {
+            font-family: 'Press Start 2P', monospace;
+            font-size: clamp(6px,1.2vw,8px); color: #7dbf8a;
+        }
+        .nivel-barra-bg {
+            width: 100%; height: 5px;
+            background: rgba(255,255,255,.1); border-radius: 3px;
+        }
+        .nivel-barra-fill {
+            height: 100%; border-radius: 3px;
+            background: linear-gradient(90deg,#d4af37,#7dbf8a);
+            transition: width .5s ease;
+        }
+        .nivel-slots {
+            display: flex; gap: 8px; flex-wrap: wrap;
+        }
+        .gema-slot {
+            display: flex; flex-direction: column; align-items: center; gap: 4px;
+            flex: 1; min-width: 52px;
+        }
+        .gema-slot-circulo {
+            width: clamp(40px,9vw,52px);
+            height: clamp(40px,9vw,52px);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            border: 2px solid;
+            position: relative;
+        }
+        .gema-slot-circulo.rec {
+            background: rgba(212,175,55,.12);
+            border-color: #d4af37;
+            box-shadow: 0 0 12px rgba(212,175,55,.25);
+        }
+        .gema-slot-circulo.pen {
+            background: rgba(0,0,0,.28);
+            border-color: rgba(255,255,255,.1);
+            filter: grayscale(1); opacity: .38;
+        }
+        .gema-slot-circulo img {
+            width: 58%; height: 58%; object-fit: contain;
+        }
+        .gema-slot-txt {
+            font-family: 'Press Start 2P', monospace;
+            font-size: clamp(5px,1vw,7px); text-align: center; line-height: 1.4;
+        }
+        .gema-slot-txt.rec  { color: #d4af37; }
+        .gema-slot-txt.pen  { color: rgba(255,255,255,.28); }
+        /* ── Modal ── */
         .modal-overlay {
             position: fixed; inset: 0; z-index: 200;
             background: rgba(0,0,0,.82);
             display: flex; align-items: center; justify-content: center;
-            padding: 20px;
-            opacity: 0; pointer-events: none;
+            padding: 20px; opacity: 0; pointer-events: none;
             transition: opacity .28s;
         }
-        .modal-overlay.on { opacity: 1; pointer-events: all; }
-
+        .modal-overlay.on { opacity:1; pointer-events:all; }
         .modal-box {
-            width: min(92vw, 460px);
-            max-height: 88vh;
-            overflow-y: auto;
-            background: linear-gradient(160deg, #0c2316, #1a4a2e);
-            border: 2px solid #2d6b4a;
-            border-radius: 16px;
+            width: min(92vw,460px); max-height: 88vh; overflow-y: auto;
+            background: linear-gradient(160deg,#0c2316,#1a4a2e);
+            border: 2px solid #2d6b4a; border-radius: 16px;
             box-shadow: 0 16px 48px rgba(0,0,0,.6);
-            display: flex;
-            flex-direction: column;
-            gap: 0;
-            transform: scale(.94);
-            transition: transform .28s;
+            display: flex; flex-direction: column;
+            transform: scale(.94); transition: transform .28s;
         }
         .modal-overlay.on .modal-box { transform: scale(1); }
-
-        .modal-img {
-            width: 100%;
-            aspect-ratio: 4/3;
-            object-fit: cover;
-            border-radius: 14px 14px 0 0;
-        }
-        .modal-body { padding: clamp(16px, 3vw, 24px); display: flex; flex-direction: column; gap: 12px; }
-
-        .modal-nombre {
-            font-family: 'Press Start 2P', monospace;
-            font-size: clamp(10px, 2.2vw, 14px);
-            color: #d4af37;
-            line-height: 1.45;
-        }
-        .modal-label {
-            font-family: 'Press Start 2P', monospace;
-            font-size: clamp(7px, 1.4vw, 9px);
-            color: #7dbf8a;
-            text-transform: uppercase;
-            letter-spacing: .05em;
-            margin-top: 4px;
-        }
-        .modal-val {
-            font-size: clamp(12px, 2vw, 14px);
-            color: rgba(255,255,255,.85);
-            line-height: 1.55;
-        }
+        .modal-img { width:100%; aspect-ratio:4/3; object-fit:cover; border-radius:14px 14px 0 0; }
+        .modal-body { padding: clamp(16px,3vw,24px); display:flex; flex-direction:column; gap:12px; }
+        .modal-nombre { font-family:'Press Start 2P',monospace; font-size:clamp(10px,2.2vw,14px); color:#d4af37; line-height:1.45; }
+        .modal-label  { font-family:'Press Start 2P',monospace; font-size:clamp(7px,1.4vw,9px); color:#7dbf8a; text-transform:uppercase; letter-spacing:.05em; margin-top:4px; }
+        .modal-val    { font-size:clamp(12px,2vw,14px); color:rgba(255,255,255,.85); line-height:1.55; }
         .modal-cerrar {
-            margin-top: 4px;
-            padding: clamp(10px, 2vw, 14px);
-            background: rgba(45,107,74,.5);
-            border: 1.5px solid #d4af37;
-            border-radius: 8px;
-            color: #d4af37;
-            font-family: 'Press Start 2P', monospace;
-            font-size: clamp(8px, 1.6vw, 10px);
-            cursor: pointer;
-            transition: background .18s;
+            margin-top:4px; padding:clamp(10px,2vw,14px);
+            background:rgba(45,107,74,.5); border:1.5px solid #d4af37;
+            border-radius:8px; color:#d4af37;
+            font-family:'Press Start 2P',monospace; font-size:clamp(8px,1.6vw,10px);
+            cursor:pointer; transition:background .18s;
         }
-        .modal-cerrar:hover { background: rgba(45,107,74,.85); }
-
-        /* ── Estado vacío ── */
-        .inv-vacio {
-            text-align: center;
-            padding: 60px 20px;
-            opacity: .6;
-        }
-        .inv-vacio-ico { font-size: 48px; margin-bottom: 16px; }
-        .inv-vacio p {
-            font-family: 'Press Start 2P', monospace;
-            font-size: clamp(8px, 1.8vw, 11px);
-            color: rgba(255,255,255,.55);
-            line-height: 1.8;
-        }
+        .modal-cerrar:hover { background:rgba(45,107,74,.85); }
     </style>
 </head>
 <body>
 
-    <!-- Header -->
-    <header class="inv-header">
-        <a onclick="location.replace('profile.html')" class="inv-back" style="cursor:pointer">←</a>
-        <div>
-            <p class="inv-titulo">Inventario de Plantas</p>
-            <p class="inv-subtitulo">Plantas ancestrales del territorio Pasto</p>
-        </div>
-        <p class="inv-contador" id="contador">0 / 30</p>
-    </header>
+<header class="inv-header">
+    <a onclick="location.replace('profile.html')" class="inv-back" style="cursor:pointer">←</a>
+    <div>
+        <p class="inv-titulo">Inventario</p>
+        <p class="inv-subtitulo">Tu progreso en Pastuker</p>
+    </div>
+</header>
 
-    <!-- Grid -->
-    <div class="inv-grid" id="invGrid"></div>
+<div class="inv-contenido">
 
-    <!-- Modal detalle -->
-    <div class="modal-overlay" id="modalDetalle">
-        <div class="modal-box">
-            <img class="modal-img" id="modalImg" src="" alt="">
-            <div class="modal-body">
-                <p class="modal-nombre"  id="modalNombre">—</p>
-                <p class="modal-label">Descripción</p>
-                <p class="modal-val"    id="modalDesc">—</p>
-                <p class="modal-label">Usos medicinales</p>
-                <p class="modal-val"    id="modalUsos">—</p>
-                <p class="modal-label">Preparación</p>
-                <p class="modal-val"    id="modalPrep">—</p>
-                <button class="modal-cerrar" id="modalCerrar">← Cerrar</button>
+    <!-- ══ SECCIÓN 1: BOSQUE SAGRADO ══ -->
+    <section>
+        <div class="sec-header">
+            <span class="sec-ico">🌿</span>
+            <div class="sec-info">
+                <p class="sec-titulo">Plantas del Bosque Sagrado</p>
+                <p class="sec-desc">Saberes medicinales ancestrales del territorio Pasto</p>
             </div>
+            <span class="sec-badge" id="contadorPlantas">0 / 30</span>
+        </div>
+        <div class="plantas-grid" id="plantasGrid"></div>
+    </section>
+
+    <!-- ══ SECCIÓN 2: SELVA PROFUNDA ══ -->
+    <section>
+        <div class="sec-header">
+            <span class="sec-ico">💎</span>
+            <div class="sec-info">
+                <p class="sec-titulo">Gemas de la Selva Profunda</p>
+                <p class="sec-desc">Coleccionables encontrados en los 10 niveles del Mundo 2</p>
+            </div>
+            <span class="sec-badge" id="contadorGemas">0 / 30</span>
+        </div>
+        <div class="gemas-grid" id="gemasGrid"></div>
+    </section>
+
+</div>
+
+<!-- Modal planta -->
+<div class="modal-overlay" id="modalDetalle">
+    <div class="modal-box">
+        <img class="modal-img" id="modalImg" src="" alt="">
+        <div class="modal-body">
+            <p class="modal-nombre" id="modalNombre">—</p>
+            <p class="modal-label">Descripción</p>
+            <p class="modal-val"   id="modalDesc">—</p>
+            <p class="modal-label">Usos medicinales</p>
+            <p class="modal-val"   id="modalUsos">—</p>
+            <p class="modal-label">Preparación</p>
+            <p class="modal-val"   id="modalPrep">—</p>
+            <button class="modal-cerrar" id="modalCerrar">← Cerrar</button>
         </div>
     </div>
+</div>
 
-    <script src="../js/plantas_catalogo.js"></script>
-    <script>
-        // Reemplaza la entrada actual del historial → el botón atrás del navegador
-        // no vuelve a esta página sino a la anterior en la ruta real
-        history.replaceState(null, '', location.href);
-        const encontradas = new Set(
-            JSON.parse(localStorage.getItem('plantas_encontradas') || '[]')
-        );
+<script src="../js/plantas_catalogo.js"></script>
+<script>
+history.replaceState(null, '', location.href);
 
-        const grid      = document.getElementById('invGrid');
-        const contador  = document.getElementById('contador');
-        const modal     = document.getElementById('modalDetalle');
-        const modalImg  = document.getElementById('modalImg');
-        const modalNom  = document.getElementById('modalNombre');
-        const modalDesc = document.getElementById('modalDesc');
-        const modalUsos = document.getElementById('modalUsos');
-        const modalPrep = document.getElementById('modalPrep');
+/* ══ PLANTAS ══ */
+const encontradas  = new Set(JSON.parse(localStorage.getItem('plantas_encontradas') || '[]'));
+const plantasGrid  = document.getElementById('plantasGrid');
+const contPlantas  = document.getElementById('contadorPlantas');
+contPlantas.textContent = `${encontradas.size} / ${window.PLANTAS_CATALOGO.length}`;
 
-        contador.textContent = `${encontradas.size} / ${window.PLANTAS_CATALOGO.length}`;
+const ordenadas = [...window.PLANTAS_CATALOGO].sort((a,b) => {
+    const aE = encontradas.has(a.id), bE = encontradas.has(b.id);
+    if (aE && !bE) return -1; if (!aE && bE) return 1;
+    return a.nombre.localeCompare(b.nombre);
+});
 
-        // Ordenar: encontradas primero, luego bloqueadas
-        const ordenadas = [...window.PLANTAS_CATALOGO].sort((a, b) => {
-            const aE = encontradas.has(a.id);
-            const bE = encontradas.has(b.id);
-            if (aE && !bE) return -1;
-            if (!aE && bE) return  1;
-            return a.nombre.localeCompare(b.nombre);
-        });
+if (!ordenadas.length) {
+    plantasGrid.innerHTML = `<div class="inv-vacio">
+        <div class="inv-vacio-ico">🌱</div>
+        <p>Aún no has encontrado plantas.<br>¡Explora el Bosque Sagrado!</p>
+    </div>`;
+}
 
-        if (ordenadas.length === 0) {
-            grid.innerHTML = `<div class="inv-vacio" style="grid-column:1/-1">
-                <div class="inv-vacio-ico">🌱</div>
-                <p>Aún no has encontrado plantas.<br>¡Explora el Bosque Sagrado!</p>
-            </div>`;
-        }
+ordenadas.forEach(p => {
+    const ok   = encontradas.has(p.id);
+    const card = document.createElement('div');
+    card.className = 'planta-card' + (ok ? '' : ' bloqueada');
+    card.innerHTML = `
+        <div class="planta-img-wrap">
+            <img src="${p.img}" alt="${p.nombre}" loading="lazy">
+            ${!ok ? '<div class="planta-lock">🔒</div>' : ''}
+        </div>
+        <p class="planta-nombre">${ok ? p.nombre : '???'}</p>`;
+    if (ok) card.addEventListener('click', () => abrirModal(p));
+    plantasGrid.appendChild(card);
+});
 
-        ordenadas.forEach(p => {
-            const desbloqueada = encontradas.has(p.id);
-            const card = document.createElement('div');
-            card.className = 'planta-card' + (desbloqueada ? '' : ' bloqueada');
-            card.innerHTML = `
-                <div class="planta-img-wrap">
-                    <img src="${p.img}" alt="${p.nombre}" loading="lazy">
-                    ${!desbloqueada ? '<div class="planta-lock">🔒</div>' : ''}
-                </div>
-                <p class="planta-nombre">${desbloqueada ? p.nombre : '???'}</p>
-            `;
+/* ══ GEMAS ══ */
+const GEM_IMG = {
+    gem_diamond: '../images/game2/game_set/Diamond_Pixel.png',
+    gem_gem:     '../images/game2/game_set/GEM_Pixel .png',
+    gem_ruby:    '../images/game2/game_set/Ruby_Pixel .png',
+};
+const GEM_LABEL = { gem_diamond:'Diamante', gem_gem:'Gema', gem_ruby:'Rubí' };
 
-            if (desbloqueada) {
-                card.addEventListener('click', () => abrirModal(p));
-            }
-            grid.appendChild(card);
-        });
+// Gemas de cada nivel — mismo orden que NIVELES[n].gems en game-2.js
+const NIVEL_GEMS = [
+    [{key:'gem_diamond',label:'Diamante'},{key:'gem_gem',label:'Esmeralda'},{key:'gem_ruby',label:'Rubí'}],   // N1
+    [{key:'gem_diamond',label:'Diamante'},{key:'gem_gem',label:'Esmeralda'},{key:'gem_ruby',label:'Rubí'}],   // N2
+    [{key:'gem_diamond',label:'Diamante'},{key:'gem_gem',label:'Esmeralda'},{key:'gem_ruby',label:'Rubí'}],   // N3
+    [{key:'gem_diamond',label:'Diamante'},{key:'gem_gem',label:'Esmeralda'},{key:'gem_ruby',label:'Rubí'}],   // N4
+    [{key:'gem_diamond',label:'Diamante'},{key:'gem_gem',label:'Esmeralda'},{key:'gem_ruby',label:'Rubí'}],   // N5
+    [{key:'gem_diamond',label:'Diamante'},{key:'gem_gem',label:'Esmeralda'},{key:'gem_ruby',label:'Rubí'}],   // N6
+    [{key:'gem_diamond',label:'Diamante'},{key:'gem_gem',label:'Esmeralda'},{key:'gem_ruby',label:'Rubí'}],   // N7
+    [{key:'gem_diamond',label:'Diamante'},{key:'gem_gem',label:'Esmeralda'},{key:'gem_ruby',label:'Rubí'}],   // N8
+    [{key:'gem_diamond',label:'Diamante'},{key:'gem_gem',label:'Esmeralda'},{key:'gem_ruby',label:'Rubí'}],   // N9
+    [{key:'gem_diamond',label:'Diamante'},{key:'gem_gem',label:'Esmeralda'},{key:'gem_ruby',label:'Rubí'}],   // N10
+];
 
-        function abrirModal(p) {
-            modalImg.src      = p.img;
-            modalImg.alt      = p.nombre;
-            modalNom.textContent  = p.nombre;
-            modalDesc.textContent = p.desc;
-            modalUsos.textContent = p.usos;
-            modalPrep.textContent = p.prep;
-            modal.classList.add('on');
-        }
+const gemasGrid  = document.getElementById('gemasGrid');
+let totalG = 0, recogG = 0;
 
-        document.getElementById('modalCerrar').addEventListener('click', () => {
-            modal.classList.remove('on');
-        });
-        modal.addEventListener('click', e => {
-            if (e.target === modal) modal.classList.remove('on');
-        });
-    </script>
+NIVEL_GEMS.forEach((gems, ni) => {
+    // Solo leer el inventario permanente — nunca se borra aunque pierda todas las vidas
+    const recogidas = new Set(JSON.parse(localStorage.getItem(`g2_inv_n${ni}`) || '[]'));
+
+    totalG += gems.length;
+    recogG += recogidas.size;
+
+    const pct  = gems.length ? Math.round(recogidas.size / gems.length * 100) : 0;
+
+    const card = document.createElement('div');
+    card.className = 'nivel-card';
+    card.innerHTML = `
+        <div class="nivel-card-top">
+            <span class="nivel-nombre">Nivel ${ni+1}</span>
+            <span class="nivel-conteo">${recogidas.size} / ${gems.length}</span>
+        </div>
+        <div class="nivel-barra-bg">
+            <div class="nivel-barra-fill" style="width:${pct}%"></div>
+        </div>
+        <div class="nivel-slots" id="slots-${ni}"></div>`;
+    gemasGrid.appendChild(card);
+
+    const wrap = card.querySelector(`#slots-${ni}`);
+    gems.forEach((g, gi) => {
+        const ok   = recogidas.has(gi);
+        const slot = document.createElement('div');
+        slot.className = 'gema-slot';
+        slot.innerHTML = `
+            <div class="gema-slot-circulo ${ok ? 'rec' : 'pen'}">
+                <img src="${GEM_IMG[g.key]}" alt="${GEM_LABEL[g.key]}" loading="lazy">
+            </div>
+            <span class="gema-slot-txt ${ok ? 'rec' : 'pen'}">${ok ? GEM_LABEL[g.key] : '???'}</span>`;
+        wrap.appendChild(slot);
+    });
+});
+
+document.getElementById('contadorGemas').textContent = `${recogG} / ${totalG}`;
+
+/* ══ MODAL ══ */
+const modal    = document.getElementById('modalDetalle');
+const modalImg = document.getElementById('modalImg');
+const modalNom = document.getElementById('modalNombre');
+const modalDsc = document.getElementById('modalDesc');
+const modalUso = document.getElementById('modalUsos');
+const modalPrp = document.getElementById('modalPrep');
+
+function abrirModal(p) {
+    modalImg.src = p.img; modalImg.alt = p.nombre;
+    modalNom.textContent = p.nombre;
+    modalDsc.textContent = p.desc;
+    modalUso.textContent = p.usos;
+    modalPrp.textContent = p.prep;
+    modal.classList.add('on');
+}
+document.getElementById('modalCerrar').addEventListener('click', () => modal.classList.remove('on'));
+modal.addEventListener('click', e => { if (e.target === modal) modal.classList.remove('on'); });
+</script>
+<script src="../js/audio.js"></script>
 </body>
 </html>

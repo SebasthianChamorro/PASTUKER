@@ -1,8 +1,13 @@
 /* ════════════════════════════════════════════════════════════════
    PASTUKER — login.js
-   Validación, mostrar/ocultar contraseña y envío del formulario
-   Archivo: js/login.js
+   Validación + integración API Flask + fallback offline
 ════════════════════════════════════════════════════════════════ */
+'use strict';
+
+// ── URL de la API ──
+// Desarrollo local : 'http://localhost:5000'
+// Producción       : 'https://TU-APP.up.railway.app'
+const API_URL = 'http://localhost:5000';
 
 /* ── Animación de entrada de la card ── */
 window.addEventListener('load', () => {
@@ -14,6 +19,13 @@ window.addEventListener('load', () => {
         card.style.opacity    = '1';
         card.style.transform  = 'translateY(0)';
     }, 200);
+
+    // Autocompletar teléfono si eligió "Recordarme" antes
+    const tel = localStorage.getItem('recordar_tel');
+    if (tel) {
+        const input = document.getElementById('telefono');
+        if (input) input.value = tel;
+    }
 });
 
 /* ── Mostrar / ocultar contraseña ── */
@@ -23,11 +35,11 @@ const ojAbierto  = btnOjo.querySelector('.ojo-abierto');
 const ojoCerrado = btnOjo.querySelector('.ojo-cerrado');
 
 btnOjo.addEventListener('click', () => {
-    const esPasword       = inputPass.type === 'password';
-    inputPass.type        = esPasword ? 'text' : 'password';
-    ojAbierto.style.display  = esPasword ? 'none'  : 'block';
-    ojoCerrado.style.display = esPasword ? 'block' : 'none';
-    btnOjo.setAttribute('aria-label', esPasword ? 'Ocultar contraseña' : 'Mostrar contraseña');
+    const esPassword        = inputPass.type === 'password';
+    inputPass.type          = esPassword ? 'text' : 'password';
+    ojAbierto.style.display  = esPassword ? 'none'  : 'block';
+    ojoCerrado.style.display = esPassword ? 'block' : 'none';
+    btnOjo.setAttribute('aria-label', esPassword ? 'Ocultar contraseña' : 'Mostrar contraseña');
 });
 
 /* ── Referencias del formulario ── */
@@ -42,8 +54,7 @@ const spinner     = document.getElementById('loginSpinner');
 
 /* ── Limpia errores al escribir ── */
 inputTel.addEventListener('input', () => {
-    // Solo permite números
-    inputTel.value = inputTel.value.replace(/\D/g, '');
+    inputTel.value = inputTel.value.replace(/\D/g, ''); // solo números
     errTel.textContent = '';
     inputTel.closest('.campo-grupo').classList.remove('campo-error-activo');
 });
@@ -53,69 +64,133 @@ inputPass.addEventListener('input', () => {
     inputPass.closest('.campo-grupo').classList.remove('campo-error-activo');
 });
 
-/* ── Validación y envío ── */
+/* ── SHA-256 en el navegador para fallback offline ── */
+async function sha256(str) {
+    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+    return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+/* ── Guardar sesión completa en localStorage ── */
+function guardarSesion(usuario, token) {
+    localStorage.setItem('usuario_id',       usuario.id);
+    localStorage.setItem('usuario_nombre',   usuario.nombre);
+    localStorage.setItem('usuario_telefono', usuario.telefono);
+    localStorage.setItem('usuario_genero', usuario.genero);
+    localStorage.setItem('usuario_avatar',   usuario.avatar  || '');
+    localStorage.setItem('usuario_xp',       usuario.xp      || 0);
+    localStorage.setItem('usuario_token',    token);
+    if (usuario.plantas_encontradas?.length) {
+        localStorage.setItem('plantas_encontradas', JSON.stringify(usuario.plantas_encontradas));
+    }
+    if (usuario.mundo2_completo) {
+        localStorage.setItem('mundo2_completo', '1');
+    }
+}
+
+/* ── Shake de error ── */
+function shakeCard() {
+    const card = document.getElementById('loginCard');
+    card.classList.add('shake');
+    setTimeout(() => card.classList.remove('shake'), 600);
+}
+
+/* ── Mostrar error global ── */
+function mostrarErrorGlobal(msg) {
+    loginErrMsg.textContent  = msg;
+    loginError.style.display = 'flex';
+    shakeCard();
+}
+
+/* ── Validación ── */
+function validar(telefono, password) {
+    let ok = true;
+    errTel.textContent  = '';
+    errPass.textContent = '';
+    inputTel.closest('.campo-grupo').classList.remove('campo-error-activo');
+    inputPass.closest('.campo-grupo').classList.remove('campo-error-activo');
+
+    if (!telefono || telefono.length < 7) {
+        errTel.textContent = 'Ingresa un número válido';
+        inputTel.closest('.campo-grupo').classList.add('campo-error-activo');
+        ok = false;
+    }
+    if (!password || password.length < 4) {
+        errPass.textContent = 'Ingresa tu contraseña';
+        inputPass.closest('.campo-grupo').classList.add('campo-error-activo');
+        ok = false;
+    }
+    return ok;
+}
+
+/* ── Estado del botón ── */
+function setLoading(on) {
+    btnLogin.disabled = on;
+    btnLogin.querySelector('.btn-login-texto').textContent = on ? 'Verificando...' : 'Iniciar Sesión';
+    spinner.style.display = on ? 'inline-block' : 'none';
+}
+
+/* ══════════════════════════════════════════════════════
+   SUBMIT
+══════════════════════════════════════════════════════ */
 form.addEventListener('submit', async (e) => {
     e.preventDefault();
     loginError.style.display = 'none';
-    let valido = true;
 
-    /* Validar teléfono */
-    if (!inputTel.value || inputTel.value.length < 7) {
-        errTel.textContent = 'Ingresa un número válido';
-        inputTel.closest('.campo-grupo').classList.add('campo-error-activo');
-        valido = false;
-    }
+    const telefono = inputTel.value.trim();
+    const password = inputPass.value.trim();
 
-    /* Validar contraseña */
-    if (!inputPass.value || inputPass.value.length < 4) {
-        errPass.textContent = 'Ingresa tu contraseña';
-        inputPass.closest('.campo-grupo').classList.add('campo-error-activo');
-        valido = false;
-    }
+    if (!validar(telefono, password)) return;
 
-    if (!valido) return;
-
-    /* Mostrar spinner mientras carga */
-    btnLogin.disabled = true;
-    btnLogin.querySelector('.btn-login-texto').textContent = 'Verificando...';
-    spinner.style.display = 'inline-block';
+    setLoading(true);
 
     try {
-        /*
-            INTEGRACIÓN CON BACKEND FLASK:
+        // ── 1. Intentar login ONLINE ──
+        const res  = await fetch(`${API_URL}/api/login`, {
+            method:  'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body:    JSON.stringify({ telefono, password }),
+            signal:  AbortSignal.timeout(6000),
+        });
+        const data = await res.json();
 
-            const res = await fetch('/api/auth/login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    telefono: inputTel.value,
-                    password: inputPass.value,
-                    recordar: document.getElementById('recordarme').checked
-                })
-            });
-            const data = await res.json();
+        if (data.ok) {
+            // Guardar hash para fallback offline
+            const pwdHash = await sha256(password);
+            localStorage.setItem('usuario_pwd_hash', pwdHash);
 
-            if (res.ok) {
-                localStorage.setItem('auth_token', data.token);
-                window.location.href = 'menugeneral.html';
+            guardarSesion(data.usuario, data.token);
+
+            if (document.getElementById('recordarme')?.checked) {
+                localStorage.setItem('recordar_tel', telefono);
             } else {
-                throw new Error(data.mensaje || 'Credenciales incorrectas');
+                localStorage.removeItem('recordar_tel');
             }
-        */
 
-        /* Por ahora: simula una pausa y redirige al menú */
-        await new Promise(r => setTimeout(r, 1200));
-        window.location.href = 'menugeneral.html';
+            window.location.replace('menugeneral.html');
+
+        } else {
+            mostrarErrorGlobal(data.msg || 'Teléfono o contraseña incorrectos');
+        }
 
     } catch (err) {
-        loginErrMsg.textContent  = err.message;
-        loginError.style.display = 'flex';
-        /* Sacude la card para indicar error */
-        document.getElementById('loginCard').classList.add('shake');
-        setTimeout(() => document.getElementById('loginCard').classList.remove('shake'), 600);
+        // ── 2. Sin conexión — intentar OFFLINE ──
+        console.warn('Sin conexión, intentando offline...', err.message);
+
+        const pwdHash     = await sha256(password);
+        const pwdGuardado = localStorage.getItem('usuario_pwd_hash');
+        const telGuardado = localStorage.getItem('usuario_telefono');
+
+        if (telGuardado === telefono && pwdGuardado === pwdHash) {
+            window.location.replace('menugeneral.html');
+        } else {
+            mostrarErrorGlobal(
+                telGuardado !== telefono
+                    ? 'Sin conexión. Teléfono no reconocido en este dispositivo.'
+                    : 'Sin conexión. Contraseña incorrecta.'
+            );
+        }
+
     } finally {
-        btnLogin.disabled = false;
-        btnLogin.querySelector('.btn-login-texto').textContent = 'Iniciar Sesión';
-        spinner.style.display = 'none';
+        setLoading(false);
     }
 });

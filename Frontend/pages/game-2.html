@@ -120,8 +120,66 @@
     .btn-cont:hover { background: #2d6b4a; }
 
     /* ══════════════════════════════════════════
-       OVERLAY QUIZ
+       OVERLAY PAUSA
     ══════════════════════════════════════════ */
+    #pause-ov {
+      position: fixed; inset: 0; z-index: 500;
+      background: rgba(0,0,0,.82);
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none;
+      transition: opacity .28s;
+    }
+    #pause-ov.on { opacity:1; pointer-events:all; }
+
+    .pause-box {
+      width: min(88vw, 360px);
+      background: linear-gradient(160deg,#0c2316,#1a4a2e);
+      border: 2px solid #2d6b4a;
+      border-radius: 16px;
+      padding: clamp(20px,4vw,32px);
+      display: flex; flex-direction: column;
+      gap: 16px; text-align: center;
+      box-shadow: 0 16px 48px rgba(0,0,0,.6);
+    }
+    .pause-titulo {
+      font-family:'Press Start 2P',monospace;
+      font-size: clamp(12px,2.5vw,16px);
+      color: #d4af37;
+    }
+    .pause-vol {
+      display: flex; flex-direction: column; gap: 8px;
+      background: rgba(45,107,74,.25);
+      border-radius: 10px; padding: 12px 16px;
+    }
+    .pause-vol label {
+      font-family:'Press Start 2P',monospace;
+      font-size: clamp(7px,1.4vw,9px);
+      color: #7dbf8a;
+    }
+    .pause-vol-row { display:flex; align-items:center; gap:10px; }
+    .pause-vol input[type=range] {
+      flex:1; accent-color:#d4af37;
+      height:6px; cursor:pointer;
+    }
+    #volValor {
+      font-family:'Press Start 2P',monospace;
+      font-size:clamp(7px,1.4vw,9px);
+      color:#d4af37; min-width:36px;
+    }
+    .pause-btn {
+      padding: clamp(10px,2vw,14px);
+      border-radius: 8px;
+      font-family:'Press Start 2P',monospace;
+      font-size: clamp(8px,1.7vw,11px);
+      cursor: pointer;
+      border: 1.5px solid;
+      transition: background .18s, transform .1s;
+    }
+    .pause-btn:active { transform: scale(.97); }
+    .pb-reanudar { background:rgba(45,107,74,.6); border-color:#7dbf8a; color:#d4af37; }
+    .pb-reanudar:hover { background:#2d6b4a; }
+    .pb-salir    { background:rgba(180,50,50,.35); border-color:#ff7070; color:#ff7070; }
+    .pb-salir:hover { background:rgba(180,50,50,.65); }
     #quiz-ov {
       position: fixed;
       inset: 0;
@@ -358,6 +416,25 @@
         <button class="qopt">Opción C</button>
         <button class="qopt">Opción D</button>
       </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════
+       OVERLAY PAUSA
+  ══════════════════════════ -->
+  <div id="pause-ov">
+    <div class="pause-box">
+      <p class="pause-titulo">⏸ Juego Pausado</p>
+      <div class="pause-vol">
+        <label>Volumen</label>
+        <div class="pause-vol-row">
+          <input type="range" min="0" max="100" value="80"
+                 oninput="cambiarVolumen(this.value)">
+          <span id="volValor">80%</span>
+        </div>
+      </div>
+      <button class="pause-btn pb-reanudar" onclick="reanudarJuego()">▶ Reanudar</button>
+      <button class="pause-btn pb-salir"    onclick="salirAlMenu()">← Salir al Menú</button>
     </div>
   </div>
 
