@@ -1,124 +1,201 @@
-
 (function () {
   'use strict';
 
-  /* ── No cargar en páginas de juego ── */
   const ruta = window.location.pathname;
   if (ruta.includes('game.html') ||
       ruta.includes('game-2.html') ||
       ruta.includes('game-3.html')) return;
 
-  /* ── Ruta del archivo ── */
   const enPages = ruta.includes('/pages/');
   const PISTA   = (enPages ? '../' : '') + 'audio/music/menu_loop.mp3';
 
-  /* ── Claves ── */
-  const SK_TIME    = 'pastuker_music_time';
-  const SK_SAVED   = 'pastuker_music_saved_at'; // timestamp cuando se guardó
-  const SK_MUTED   = 'pastuker_music_muted';
+  const SK_TIME  = 'pastuker_music_time';
+  const SK_SAVED = 'pastuker_music_saved_at';
+  const SK_MUTED = 'pastuker_music_muted';
+  const SK_OK    = 'pastuker_audio_ok';
 
-  let audio    = null;
-  let _saveInt = null;
-  let _fadeInt = null;
-  let _listo   = false; // true cuando loadedmetadata disparó
+  let audio     = null;
+  let blobURL   = null;
+  let _saveInt  = null;
+  let _fadeInt  = null;
+
+  window._pastukerAudioDesbloqueado = !!sessionStorage.getItem(SK_OK);
 
   const isMuted  = () => localStorage.getItem(SK_MUTED) === 'off';
   const setMuted = (v) => localStorage.setItem(SK_MUTED, v ? 'off' : 'on');
 
-  /* ── Crear audio ── */
-  function crearAudio() {
-    audio        = new Audio(PISTA);
+  function _iniciarGuardado() {
+    clearInterval(_saveInt);
+    _saveInt = setInterval(() => {
+      if (audio) {
+        sessionStorage.setItem(SK_TIME,  audio.currentTime);
+        sessionStorage.setItem(SK_SAVED, Date.now());
+      }
+    }, 300);
+  }
+
+  function desbloquearContexto() {
+    try {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (AC) { const ctx = new AC(); ctx.resume().then(() => ctx.close()).catch(() => {}); }
+    } catch(_) {}
+  }
+
+  function marcarDesbloqueado() {
+    window._pastukerAudioDesbloqueado = true;
+    sessionStorage.setItem(SK_OK, '1');
+  }
+
+  /* ── Crear Audio desde blobURL o ruta normal ── */
+  function crearAudioDesde(src) {
+    if (audio) { try { audio.pause(); } catch(_) {} }
+    audio        = new Audio(src);
     audio.loop   = true;
     audio.volume = 0.45;
-    audio.preload = 'auto';
 
-    audio.addEventListener('loadedmetadata', onListo);
-    // Por si loadedmetadata ya disparó (caché del navegador)
-    if (audio.readyState >= 1) onListo();
+    const savedTime = parseFloat(sessionStorage.getItem(SK_TIME) || '0');
+    const savedAt   = parseInt(sessionStorage.getItem(SK_SAVED)  || '0');
+    if (savedTime > 0 && savedAt > 0) {
+      audio.addEventListener('loadedmetadata', () => {
+        if (audio && audio.duration) {
+          const lag = (Date.now() - savedAt) / 1000;
+          audio.currentTime = (savedTime + lag) % audio.duration;
+        }
+      }, { once: true });
+    }
+    _iniciarGuardado();
+    return audio;
   }
 
-  /* ── Cuando el audio está listo para usar ── */
-  function onListo() {
-    if (_listo) return;
-    _listo = true;
+  /* ── Precargar audio como blob (evita problemas de range requests) ── */
+  function precargarBlob(cb) {
+    if (blobURL) { cb(blobURL); return; }
+    fetch(PISTA)
+      .then(r => r.blob())
+      .then(blob => {
+        blobURL = URL.createObjectURL(blob);
+        cb(blobURL);
+      })
+      .catch(() => {
+        // Si fetch falla usar ruta normal
+        cb(PISTA);
+      });
+  }
 
-    // Calcular posición compensando el tiempo de carga de la página
-    const savedTime   = parseFloat(sessionStorage.getItem(SK_TIME) || '0');
-    const savedAt     = parseInt(sessionStorage.getItem(SK_SAVED)  || '0');
-    const ahora       = Date.now();
-    const tiempoCarga = savedAt > 0 ? (ahora - savedAt) / 1000 : 0;
+  /* ══════════════════════════════════════════════════════
+     SPLASH
+  ══════════════════════════════════════════════════════ */
+  function mostrarSplash() {
+    if (document.getElementById('pastuker-splash')) return;
 
-    if (savedTime > 0 && audio.duration) {
-      // Avanzar la posición según cuánto tardó en cargar la página
-      const nuevaPos = (savedTime + tiempoCarga) % audio.duration;
-      audio.currentTime = nuevaPos;
+    // Iniciar precarga del blob mientras aparece el splash
+    precargarBlob(() => {});
+
+    const splash = document.createElement('div');
+    splash.id = 'pastuker-splash';
+    splash.style.cssText = [
+      'position:fixed','inset:0','z-index:99999',
+      'background:rgba(10,26,16,0.95)',
+      'display:flex','flex-direction:column',
+      'align-items:center','justify-content:center','gap:24px',
+      'cursor:pointer','-webkit-tap-highlight-color:transparent',
+      'touch-action:manipulation',
+    ].join(';');
+
+    splash.innerHTML = `
+      <style>@keyframes _spl{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}</style>
+      <div style="width:90px;height:90px;border-radius:50%;
+        background:rgba(45,107,74,0.9);border:3px solid #d4af37;
+        display:flex;align-items:center;justify-content:center;font-size:40px;
+        animation:_spl 1.3s ease-in-out infinite;">🎵</div>
+      <p style="font-family:'Press Start 2P',monospace;font-size:clamp(10px,3vw,14px);
+        color:#d4af37;text-align:center;line-height:2;margin:0;padding:0 28px;">
+        Toca para comenzar</p>
+      <p style="font-family:'Press Start 2P',monospace;font-size:clamp(7px,1.8vw,9px);
+        color:rgba(212,175,55,0.4);text-align:center;margin:0;padding:0 36px;line-height:2;">
+        Pastuker · Saberes Ancestrales Pastos</p>
+    `;
+
+    document.body.appendChild(splash);
+
+    function arrancar(e) {
+      e.preventDefault();
+      e.stopPropagation();
+
+      desbloquearContexto();
+      marcarDesbloqueado();
+
+      splash.style.transition = 'opacity 0.35s';
+      splash.style.opacity    = '0';
+      setTimeout(() => { if (splash.parentNode) splash.remove(); }, 350);
+
+      if (isMuted()) return;
+
+      // Usar blobURL si está listo, sino ruta normal
+      const src = blobURL || PISTA;
+      crearAudioDesde(src);
+      const p = audio.play();
+      if (p) p.then(() => actualizarBoton(true)).catch(err => {
+        console.warn('[Audio] play() falló:', err.message);
+      });
     }
 
-    // Guardar posición cada 300ms
-    _saveInt = setInterval(guardarPosicion, 300);
-
-    intentarPlay();
+    splash.addEventListener('touchend', arrancar, { passive: false, once: true });
+    splash.addEventListener('click',    arrancar, { once: true });
   }
 
-  /* ── Guardar posición actual ── */
-  function guardarPosicion() {
-    if (!audio) return;
-    sessionStorage.setItem(SK_TIME,  audio.currentTime);
-    sessionStorage.setItem(SK_SAVED, Date.now());
-  }
-
-  /* ── Intentar reproducir ── */
-  function intentarPlay() {
+  /* ══════════════════════════════════════════════════════
+     INIT
+  ══════════════════════════════════════════════════════ */
+  function init() {
+    crearBoton();
     if (isMuted()) { actualizarBoton(false); return; }
-    audio.play().then(() => {
-      actualizarBoton(true);
-    }).catch(() => {
-      // Autoplay bloqueado → esperar interacción
-      const handler = () => {
-        audio.play().then(() => actualizarBoton(true)).catch(() => {});
-        document.removeEventListener('click',    handler);
-        document.removeEventListener('touchend', handler);
-        document.removeEventListener('keydown',  handler);
-        document.removeEventListener('touchstart', handler);
-      };
-      document.addEventListener('click',      handler, { once: true });
-      document.addEventListener('touchend',   handler, { once: true });
-      document.addEventListener('touchstart', handler, { once: true });
-      document.addEventListener('keydown',    handler, { once: true });
-    });
-  }
 
-  /* ── Fade out ── */
-  function fadeOut(cb) {
-    if (_fadeInt) clearInterval(_fadeInt);
-    if (!audio || audio.paused) { if (cb) cb(); return; }
-    let v = audio.volume;
-    _fadeInt = setInterval(() => {
-      v = Math.max(0, v - 0.06);
-      audio.volume = v;
-      if (v <= 0) {
-        clearInterval(_fadeInt);
-        audio.pause();
-        audio.volume = 0.45;
-        if (cb) cb();
+    // Precargar el blob en background
+    precargarBlob((src) => {
+      crearAudioDesde(src);
+      const p = audio.play();
+      if (p && p.then) {
+        p.then(() => {
+          marcarDesbloqueado();
+          actualizarBoton(true);
+        }).catch(() => {
+          if (!enPages) mostrarSplash();
+        });
       }
-    }, 25);
+    });
   }
 
   /* ── Toggle silencio ── */
   function toggleMusica() {
-    if (!_listo) return;
+    if (!audio) return;
     if (audio.paused) {
       setMuted(false);
       audio.volume = 0.45;
-      intentarPlay();
+      const p = audio.play();
+      if (p && p.catch) p.catch(() => {});
+      actualizarBoton(true);
     } else {
       setMuted(true);
       fadeOut(() => actualizarBoton(false));
     }
   }
 
-  /* ── Botón flotante ── */
+  function fadeOut(cb) {
+    if (_fadeInt) clearInterval(_fadeInt);
+    if (!audio || audio.paused) { if (cb) cb(); return; }
+    let v = audio.volume;
+    _fadeInt = setInterval(() => {
+      v = Math.max(0, v - 0.06);
+      if (audio) audio.volume = v;
+      if (v <= 0) {
+        clearInterval(_fadeInt);
+        if (audio) { audio.pause(); audio.volume = 0.45; }
+        if (cb) cb();
+      }
+    }, 25);
+  }
+
   function crearBoton() {
     if (document.getElementById('pastuker-music-btn')) return;
     const btn = document.createElement('button');
@@ -136,14 +213,8 @@
       'outline:none','-webkit-tap-highlight-color:transparent',
     ].join(';');
     btn.innerHTML = isMuted() ? '🔇' : '🎵';
-    btn.addEventListener('mouseenter', () => {
-      btn.style.transform   = 'scale(1.15)';
-      btn.style.borderColor = '#d4af37';
-    });
-    btn.addEventListener('mouseleave', () => {
-      btn.style.transform   = 'scale(1)';
-      btn.style.borderColor = 'rgba(212,175,55,0.6)';
-    });
+    btn.addEventListener('mouseenter', () => { btn.style.transform='scale(1.15)'; btn.style.borderColor='#d4af37'; });
+    btn.addEventListener('mouseleave', () => { btn.style.transform='scale(1)'; btn.style.borderColor='rgba(212,175,55,0.6)'; });
     btn.addEventListener('click', toggleMusica);
     document.body.appendChild(btn);
   }
@@ -153,39 +224,34 @@
     if (btn) btn.innerHTML = sonando ? '🎵' : '🔇';
   }
 
-  /* ── Guardar posición justo antes de salir de la página ── */
   window.addEventListener('beforeunload', () => {
-    guardarPosicion();
+    if (audio) {
+      sessionStorage.setItem(SK_TIME,  audio.currentTime);
+      sessionStorage.setItem(SK_SAVED, Date.now());
+    }
   });
 
-  /* ── Interceptar navegación hacia juegos ── */
   document.addEventListener('click', (e) => {
     const link = e.target.closest('a[href]');
     if (!link) return;
     const href = link.getAttribute('href') || '';
     if (href.startsWith('#') || href.startsWith('http') || href.startsWith('//')) return;
-
     const esJuego = href.includes('game.html') ||
                     href.includes('game-2.html') ||
                     href.includes('game-3.html');
-
     if (esJuego) {
       e.preventDefault();
-      guardarPosicion(); // guardar antes del fade
+      if (audio) {
+        sessionStorage.setItem(SK_TIME,  audio.currentTime);
+        sessionStorage.setItem(SK_SAVED, Date.now());
+      }
       fadeOut(() => {
         sessionStorage.setItem(SK_TIME,  '0');
         sessionStorage.setItem(SK_SAVED, '0');
         window.location.href = href;
       });
     }
-    // Si NO es juego: beforeunload guarda la posición antes de navegar
   }, true);
-
-  /* ── INIT ── */
-  function init() {
-    crearAudio();
-    crearBoton();
-  }
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <meta name="theme-color" content="#1a4a2e">
+    <title>Pastuker — Tabla de Ranking</title>
+    <link rel="manifest" href="../manifest.json">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/ranking.css">
+    <style>
+        body { background: linear-gradient(180deg, #0f2e1c 0%, #1a4a2e 55%, #12331f 100%); min-height: 100vh; }
+        .contenido-principal { min-height: 100vh; }
+        .ranking-card { position: relative; }
+        .tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin: 4px 0 2px; }
+        .tab {
+            padding: 10px 4px; border-radius: 10px; border: 1.5px solid rgba(212,175,55,.25) !important;
+            background: rgba(255,255,255,.04) !important; color: rgba(255,255,255,.7);
+            font-family: var(--fuente-pixel); font-size: 7px; line-height: 1.6; letter-spacing: .3px;
+        }
+        .tab.activa { border-color: var(--dorado) !important; background: rgba(212,175,55,.16) !important; color: var(--dorado-claro); }
+        .estado { font-size: 12px; color: rgba(255,255,255,.6); text-align: center; min-height: 18px; }
+        .estado.aviso { color: #f0d060; }
+        .lista { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+        .fila {
+            display: grid; grid-template-columns: 34px 40px 1fr auto; align-items: center; gap: 10px;
+            padding: 8px 10px; border-radius: 12px;
+            background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.07);
+        }
+        .fila.tu { border-color: var(--dorado); background: rgba(212,175,55,.14); }
+        .pos { font-family: var(--fuente-pixel); font-size: 10px; color: rgba(255,255,255,.75); text-align: center; }
+        .pos.oro { color: #ffd54a; } .pos.plata { color: #d9e2ec; } .pos.bronce { color: #e3a36b; }
+        .ava { width: 40px; height: 40px; border-radius: 50%; background: #2d6b4a; border: 1.5px solid rgba(212,175,55,.4); }
+        .nom { font-weight: 800; font-size: 14px; color: #fff; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .nom small { display: block; font-weight: 600; font-size: 11px; color: rgba(255,255,255,.5); }
+        .val { font-family: var(--fuente-pixel); font-size: 9px; color: var(--dorado-claro); text-align: right; white-space: nowrap; }
+        .mi-pos { text-align: center; font-size: 13px; font-weight: 700; color: var(--dorado-claro); }
+        .vacio { text-align: center; padding: 24px 8px; color: rgba(255,255,255,.6); font-size: 13px; }
+    </style>
+</head>
+<body>
+    <main class="contenido-principal">
+        <div class="ranking-card" id="rankingCard">
+            <a href="ranking.html" class="btn-regresar" aria-label="Regresar">
+                <svg viewBox="0 0 24 24" fill="none">
+                    <path d="M19 12H5M5 12l7-7M5 12l7 7" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </a>
+
+            <div class="ranking-header">
+                <h1 class="ranking-titulo" id="titulo">Ranking General</h1>
+                <p class="ranking-subtitulo" id="subtitulo">Top 50 por XP</p>
+            </div>
+
+            <div class="tabs" role="tablist">
+                <button class="tab" data-modo="general" role="tab">🏆<br>General</button>
+                <button class="tab" data-modo="plantas" role="tab">🌿<br>Plantas</button>
+                <button class="tab" data-modo="selva" role="tab">💎<br>Selva</button>
+            </div>
+
+            <p class="estado" id="estado">Cargando…</p>
+            <p class="mi-pos" id="miPos"></p>
+            <ol class="lista" id="lista"></ol>
+        </div>
+    </main>
+
+    <script src="../js/api.js"></script>
+    <script src="../js/ranking-tabla.js"></script>
+    <script src="../js/audio.js"></script>
+</body>
+</html>

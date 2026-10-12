@@ -1,4 +1,7 @@
 /* ════════ PASTUKER — Bosque Sagrado · Top-down v3 ════════════ */
+// Forzar modo horizontal
+screen.orientation.lock('landscape-primary').catch(() => {});
+
 const MAP_W=5600,MAP_H=4200,SPD=200,PROX_PLANTA=80,PROX_TAITA=120,PLANTAS_META=5;
 const TAITA_X=MAP_W/2,TAITA_Y=MAP_H/2;
 const MM_W=160,MM_H=120;
@@ -80,6 +83,13 @@ class PreloadScene extends Phaser.Scene{
     create(){this.scene.start('World')}
 }
 
+/* ── Helper seguro para llamar DialogoSistema desde Phaser ── */
+function _dialogo(id, opts = {}) {
+    if (typeof DialogoSistema !== 'undefined') {
+        DialogoSistema.mostrar(id, opts);
+    }
+}
+
 function getPersonaje(){
     const g=localStorage.getItem('usuario_genero')||'hombre';
     const m=localStorage.getItem('mundo_actual')||'1';
@@ -105,6 +115,19 @@ class WorldScene extends Phaser.Scene{
         // ── Música de fondo en loop ──
         this._musica = this.sound.add('forest_loop', { loop: true, volume: _volumen * 0.6 });
         this._musica.play();
+
+        // ── Flags para diálogos (evitar repetición) ──
+        this._dialogoInicioMostrado = false;
+        this._taitaMsgShown         = false;
+        this._logroPendiente        = null;
+
+        // ── Diálogo de inicio — una sola vez al entrar al bosque ──
+        this.time.delayedCall(3500, () => {
+            if (!this._dialogoInicioMostrado && !panelOpen && !quizOn) {
+                this._dialogoInicioMostrado = true;
+                _dialogo('juego_inicio');
+            }
+        });
     }
 
     // ── Helper: reproducir SFX con volumen global ──
@@ -303,6 +326,21 @@ class WorldScene extends Phaser.Scene{
                 if(nc&&recolectadas.length>=PLANTAS_META) btnQuiz.classList.add('on');
                 else if(!nc) btnQuiz.classList.remove('on');
             }
+
+            // ── Diálogo al acercarse al Taita ──
+            if(nc && !panelOpen && !quizOn) {
+                if(!this._taitaMsgShown) {
+                    this._taitaMsgShown = true;
+                    if(recolectadas.length >= PLANTAS_META) {
+                        _dialogo('juego_taita_con_plantas');
+                    } else {
+                        _dialogo('juego_taita_sin_plantas');
+                    }
+                }
+            }
+            if(!nc) {
+                this._taitaMsgShown = false; // reset al alejarse
+            }
         }
         if(nc){const cam=this.cameras.main;const sx=(this._tx-cam.scrollX)*cam.zoom;const sy=(this._ty-cam.scrollY)*cam.zoom-90;const b=document.getElementById('burbuja');b.style.left=sx+'px';b.style.top=sy+'px';b.style.transform='translateX(-50%)';}
     }
@@ -326,6 +364,7 @@ function interactuar(){
     const _ids=new Set(JSON.parse(localStorage.getItem('plantas_encontradas')||'[]'));
     _ids.add(d.id);
     localStorage.setItem('plantas_encontradas',JSON.stringify([..._ids]));
+    if(window.Pastuker)Pastuker.marcarCambio();  // ── sincroniza con el servidor
 
     // ── SFX recoger planta ──
     const ws=game.scene.getScene('World');
@@ -337,6 +376,11 @@ function interactuar(){
     document.getElementById('hud-fill').style.width=Math.min(n/PLANTAS_META*100,100)+'%';
     if(n>=PLANTAS_META)taitaParpadeo=true;
     if(taitaCerca)_actualizarBurbuja();
+
+    // ── Logro según cantidad de plantas ──
+    if(n===1)      ws._logroPendiente = 'logro_primera_planta';
+    else if(n>=PLANTAS_META) ws._logroPendiente = 'logro_cinco_plantas';
+
     _abrirPanel(d,n);
 }
 
@@ -354,7 +398,19 @@ function _abrirPanel(p,n){
     document.getElementById('panel').classList.add('on');
 }
 
-function cerrarPanel(){panelOpen=false;document.getElementById('panel').classList.remove('on');setTimeout(()=>game.scale.refresh(),420);}
+function cerrarPanel(){
+    panelOpen=false;
+    document.getElementById('panel').classList.remove('on');
+    setTimeout(()=>game.scale.refresh(),420);
+
+    // ── Mostrar logro pendiente si hay uno ──
+    const ws = game.scene.getScene('World');
+    if(ws && ws._logroPendiente) {
+        const id = ws._logroPendiente;
+        ws._logroPendiente = null;
+        setTimeout(() => _dialogo(id), 300);
+    }
+}
 
 function _actualizarBurbuja(){
     const b=document.getElementById('burbuja'),n=recolectadas.length;
@@ -367,6 +423,13 @@ function _actualizarBurbuja(){
 
 function iniciarQuiz(){
     if(recolectadas.length<PLANTAS_META)return;
+    // ── Diálogo del Taita antes del quiz ──
+    _dialogo('juego_antes_quiz', {
+        onCerrar: () => _comenzarQuiz()
+    });
+}
+
+function _comenzarQuiz(){
     quizOn=true;qIdx=0;qPts=0;taitaParpadeo=false;
     document.getElementById('btn-quiz').classList.remove('on');
     let banco=[];recolectadas.forEach(p=>{banco=banco.concat(p.preguntas||[]);});
@@ -381,7 +444,13 @@ function _mostrarQ(){
     const imgEl=document.getElementById('q-planta-img');
     if(imgEl){
         imgEl.innerHTML='';
-        if(pl){const img=document.createElement('img');img.src=pl.img;img.alt=pl.nombre;imgEl.appendChild(img);}
+        if(pl){
+            const img=document.createElement('img');
+            img.src=pl.img;
+            img.alt=pl.nombre;
+            img.style.cssText='height:56px;width:auto;max-width:80px;object-fit:contain;image-rendering:pixelated;border-radius:8px;border:1.5px solid rgba(212,175,55,0.4);';
+            imgEl.appendChild(img);
+        }
     }
     document.getElementById('qprog').textContent=(qIdx+1)+'/'+qPregs.length;
     document.getElementById('qpreg').textContent=q.p;
@@ -428,16 +497,47 @@ function _finQuiz(){
     document.getElementById('res-ov').classList.add('on');
     localStorage.setItem('puntos_total',(parseInt(localStorage.getItem('puntos_total')||'0')+qPts*10));
     localStorage.setItem('partidas',(parseInt(localStorage.getItem('partidas')||'0')+1));
+    // ── Cada acierto suma 10 XP al total del jugador (ranking por XP) ──
+    localStorage.setItem('usuario_xp',(parseInt(localStorage.getItem('usuario_xp')||'0')+qPts*10));
+    localStorage.setItem('quiz_aciertos',(parseInt(localStorage.getItem('quiz_aciertos')||'0')+qPts));
+    localStorage.setItem('quiz_preguntas',(parseInt(localStorage.getItem('quiz_preguntas')||'0')+qPregs.length));
+    if(window.Pastuker)Pastuker.marcarCambio();
 
     // ── SFX nivel completo si puntaje >= 50% ──
     const ws=game.scene.getScene('World');
     if(ws && pct>=.5) ws._sfx('sfx_nivel', 0.9);
+
+    // ── Diálogo de resultado del Taita ──
+    let dialogoRes;
+    if(pct>=.9)      dialogoRes = 'logro_quiz_perfecto';
+    else if(pct>=.7) dialogoRes = 'juego_resultado_bueno';
+    else if(pct>=.5) dialogoRes = 'juego_resultado_regular';
+    else             dialogoRes = 'juego_resultado_bajo';
+    setTimeout(() => _dialogo(dialogoRes), 600);
 }
 
 function continuar(){
     document.getElementById('res-ov').classList.remove('on');
     const ws=game.scene.getScene('World');
-    if(ws)ws._secuenciaPortal();
+
+    // ── logro_mundo_completo la primera vez que termina el bosque ──
+    const yaCompleto = localStorage.getItem('mundo1_completo');
+    if(!yaCompleto) {
+        localStorage.setItem('mundo1_completo', '1');
+        if(window.Pastuker)Pastuker.marcarCambio();
+        _dialogo('logro_mundo_completo', {
+            onCerrar: () => {
+                _dialogo('juego_portal', {
+                    onCerrar: () => { if(ws) ws._secuenciaPortal(); }
+                });
+            }
+        });
+    } else {
+        // Ya completó antes — ir directo al portal con diálogo
+        _dialogo('juego_portal', {
+            onCerrar: () => { if(ws) ws._secuenciaPortal(); }
+        });
+    }
 }
 function repetirQuiz(){document.getElementById('res-ov').classList.remove('on');iniciarQuiz();}
 function irMenu(){window.location.href='menugeneral.html';}
@@ -454,8 +554,8 @@ function cambiarVolumen(val){
 const game=new Phaser.Game({
     type:Phaser.AUTO,
     parent:'game-container',
-    width:window.innerWidth,
-    height:window.innerHeight,
+    width:window.screen.width,
+    height:window.screen.height,
     backgroundColor:'#276132',
     physics:{default:'arcade',arcade:{gravity:{y:0},debug:false}},
     scene:[PreloadScene,WorldScene],

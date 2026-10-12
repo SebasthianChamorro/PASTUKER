@@ -3,6 +3,9 @@
    Mundo 2: Selva Profunda  •  Plataformero × 10 Niveles
    Obstáculos: fire_up, fire_down, stakes, rot1, rot2
 ══════════════════════════════════════════════════════════════ */
+// Forzar modo horizontal
+screen.orientation.lock('landscape-primary').catch(() => {});
+
 'use strict';
 
 /* ── Volumen global (0.0 - 1.0) controlado desde el pause ── */
@@ -1016,6 +1019,7 @@ class GameScene2 extends Phaser.Scene {
     const xpGain = xpMap[this._gems[idx]?.key] || 10;
     const xp     = parseInt(localStorage.getItem('usuario_xp') || '0');
     localStorage.setItem('usuario_xp', xp + xpGain);
+    if (window.Pastuker) Pastuker.marcarCambio();
 
     const colMap = { gem_diamond:'#00e5ff', gem_gem:'#00ff88', gem_ruby:'#ff4444' };
     const col    = colMap[this._gems[idx]?.key] || '#00e5ff';
@@ -1349,6 +1353,7 @@ class GameScene2 extends Phaser.Scene {
       localStorage.setItem('plantas_encontradas', JSON.stringify([..._ids]));
     }
     if (this.nivel >= G2.LEVELS - 1) localStorage.setItem('mundo2_completo', '1');
+    if (window.Pastuker) Pastuker.marcarCambio();
 
     const panel = document.getElementById('panel');
     if (!panel) { this._iniciarQuizPlanta(); return; }
@@ -1409,6 +1414,7 @@ class GameScene2 extends Phaser.Scene {
           b.classList.add('ok');
           const xp = parseInt(localStorage.getItem('usuario_xp') || '0');
           localStorage.setItem('usuario_xp', xp + 25);
+          if (window.Pastuker) Pastuker.marcarCambio();
           this._sfx('sfx2_correcto', 0.8);  // ── SFX correcto ──
         } else {
           b.classList.add('mal');
@@ -1477,6 +1483,7 @@ class GameScene2 extends Phaser.Scene {
     [...temp].forEach(i => inv.add(i));
     localStorage.setItem(invKey, JSON.stringify([...inv]));
     localStorage.removeItem(tempKey);
+    if (window.Pastuker) Pastuker.marcarCambio();  // gemas del nivel → servidor
 
     // ── SFX nivel completo + detener música limpiamente ──
     this._sfx('sfx2_nivel', 0.9);
@@ -1875,8 +1882,6 @@ class GameOverScene2 extends Phaser.Scene {
 ══════════════════════════════════════════════════════════════ */
 const game2PhaserConfig = {
   type:   Phaser.AUTO,
-  width:  window.innerWidth,
-  height: window.innerHeight,
   parent: 'game-wrap',
   backgroundColor: '#1a6a3e',
   physics: {
@@ -1884,12 +1889,26 @@ const game2PhaserConfig = {
     arcade:  { gravity:{ y:0 }, debug:false },
   },
   scene: [PreloadScene2, GameScene2, GameOverScene2],
-  scale: { mode: Phaser.Scale.FIT, autoCenter: Phaser.Scale.CENTER_BOTH },
+  scale: {
+    mode: Phaser.Scale.RESIZE,
+    autoCenter: Phaser.Scale.CENTER_BOTH,
+  },
 };
 
 let _g2;
 
-window.addEventListener('load', () => { _g2 = new Phaser.Game(game2PhaserConfig); });
+window.addEventListener('load', () => {
+  // Solicitar pantalla completa al tocar la pantalla
+  document.addEventListener('touchstart', () => {
+    if (document.documentElement.requestFullscreen) {
+      document.documentElement.requestFullscreen().catch(() => {});
+    } else if (document.documentElement.webkitRequestFullscreen) {
+      document.documentElement.webkitRequestFullscreen();
+    }
+  }, { once: true });
+  
+  _g2 = new Phaser.Game(game2PhaserConfig);
+});
 
 /* ── Funciones globales del pause overlay ── */
 function reanudarJuego() {

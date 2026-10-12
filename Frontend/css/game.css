@@ -43,8 +43,11 @@ canvas {
 
 @media (orientation: portrait) {
     #rotate-msg { display: flex; }
+    #game-wrap, #hud, #dpad, #minimap-wrap, 
+    #btn-act, #btn-salir, #dpad-lr, #dpad-ud { 
+        display: none !important; 
+    }
 }
-
 .rot-ph {
     font-size: 72px;
     animation: giro 2.5s ease-in-out infinite;
@@ -816,4 +819,29 @@ canvas {
     padding: 14px;
     font-size: clamp(7px, 1vw, 9px);
     margin-top: auto;
+}
+
+/* ══ GAME CONTAINER (Phaser) ══ */
+#game-wrap {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 0;
+}
+
+#game-container {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+}
+
+#game-container canvas {
+    display: block;
+    width: 100vw !important;
+    height: 100vh !important;
+    position: fixed;
+    top: 0;
+    left: 0;
 }

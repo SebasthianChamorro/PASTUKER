@@ -11,21 +11,12 @@
     <link rel="stylesheet" href="../css/profile.css">
     <link rel="stylesheet" href="../css/dialogos.css">
     <style>
-        .stat-box-btn {
-            cursor: pointer;
-            transition: background .18s, transform .15s;
-        }
-        .stat-box-btn:hover  { background: rgba(45,107,74,.55); transform: translateY(-2px); }
-        .stat-box-btn:active { transform: translateY(0); }
-        .stat-ir {
-            display: block;
-            font-family: 'Press Start 2P', monospace;
-            font-size: clamp(6px, 1.2vw, 8px);
-            color: #7dbf8a;
-            margin-top: 5px;
-        }
-        .stat-box-pronto { cursor: default; opacity: .65; }
-        .stat-box-pronto:hover { transform: none !important; background: unset !important; }
+        .stat-box-btn { cursor:pointer;transition:background .18s,transform .15s; }
+        .stat-box-btn:hover  { background:rgba(45,107,74,.55);transform:translateY(-2px); }
+        .stat-box-btn:active { transform:translateY(0); }
+        .stat-ir { display:block;font-family:'Press Start 2P',monospace;font-size:clamp(6px,1.2vw,8px);color:#7dbf8a;margin-top:5px; }
+        .stat-box-pronto { cursor:default;opacity:.65; }
+        .stat-box-pronto:hover { transform:none!important;background:unset!important; }
     </style>
 </head>
 <body>
@@ -129,7 +120,8 @@
                 </div>
                 <p class="usuario-nombre"   id="displayNombre">Explorador</p>
                 <p class="usuario-telefono" id="displayTelefono">---</p>
-                <button class="btn-editar-avatar" onclick="window.location.href='avatar-selector.html'">
+                <button class="btn-editar-avatar" id="btnEditarAvatar"
+                    onclick="window.location.href='avatar-selector.html'">
                     <svg viewBox="0 0 24 24" fill="none">
                         <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
                         <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
@@ -140,7 +132,6 @@
 
             <div class="secciones">
 
-                <!-- Cambiar nombre -->
                 <div class="seccion-item" id="seccionNombre">
                     <button class="seccion-trigger" id="btnCambiarNombre">
                         <div class="seccion-icono icono-nombre">
@@ -167,7 +158,6 @@
                     </div>
                 </div>
 
-                <!-- Cambiar contraseña -->
                 <div class="seccion-item" id="seccionPass">
                     <button class="seccion-trigger" id="btnCambiarPass">
                         <div class="seccion-icono icono-pass">
@@ -218,7 +208,6 @@
                     </div>
                 </div>
 
-                <!-- Mis estadísticas -->
                 <div class="seccion-item" id="seccionStats">
                     <button class="seccion-trigger" id="btnStats">
                         <div class="seccion-icono icono-stats">
@@ -236,29 +225,46 @@
                         <div class="panel-inner stats-grid">
                             <div class="stat-box">
                                 <p class="stat-num" id="statPuntos">0</p>
-                                <p class="stat-etiq">Puntos totales</p>
+                                <p class="stat-etiq">XP total</p>
                             </div>
                             <div class="stat-box">
                                 <p class="stat-num" id="statPartidas">0</p>
                                 <p class="stat-etiq">Partidas jugadas</p>
                             </div>
-                            <!-- Plantas → inventario.html -->
                             <div class="stat-box stat-box-btn" onclick="window.location.href='inventario.html'">
                                 <p class="stat-num" id="statPlantas">0</p>
                                 <p class="stat-etiq">Plantas encontradas</p>
                                 <span class="stat-ir">Ver inventario →</span>
                             </div>
-                            <!-- Logros → próximamente -->
-                            <div class="stat-box stat-box-btn stat-box-pronto">
-                                <p class="stat-num">🏆</p>
-                                <p class="stat-etiq">Logros</p>
-                                <span class="stat-ir">Próximamente</span>
+                            <div class="stat-box stat-box-btn" onclick="window.location.href='ranking-tabla.html?modo=general'">
+                                <p class="stat-num" id="statRanking">—</p>
+                                <p class="stat-etiq">Puesto en el ranking</p>
+                                <span class="stat-ir">Ver ranking →</span>
+                            </div>
+                            <div class="stat-box">
+                                <p class="stat-num" id="statAciertos">—</p>
+                                <p class="stat-etiq">Aciertos en el quiz</p>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Eliminar cuenta -->
+                <div class="seccion-item">
+                    <a class="seccion-trigger" href="privacidad.html">
+                        <div class="seccion-icono icono-pass">
+                            <svg viewBox="0 0 24 24" fill="none">
+                                <path d="M12 2l8 4v6c0 5-3.5 9-8 10-4.5-1-8-5-8-10V6l8-4z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+                                <path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                        <div class="seccion-texto">
+                            <p class="seccion-titulo">Privacidad y mis datos</p>
+                            <p class="seccion-desc">Qué guardamos, para qué y tus derechos</p>
+                        </div>
+                        <div class="seccion-flecha">›</div>
+                    </a>
+                </div>
+
                 <div class="seccion-item seccion-peligro">
                     <button class="seccion-trigger" id="btnEliminar">
                         <div class="seccion-icono icono-eliminar">
@@ -295,6 +301,11 @@
                 <label class="campo-label" for="confirmEliminar">Escribe <strong style="color:#ff7070">ELIMINAR</strong> para confirmar</label>
                 <input type="text" id="confirmEliminar" class="campo-input" placeholder="ELIMINAR">
             </div>
+            <div class="campo-grupo" style="width:100%">
+                <label class="campo-label" for="passEliminar">Tu contraseña</label>
+                <input type="password" id="passEliminar" class="campo-input" placeholder="Contraseña actual">
+                <span class="campo-error" id="errorEliminar"></span>
+            </div>
             <div class="modal-botones">
                 <button class="modal-btn modal-cancelar" id="modalCancelar">Cancelar</button>
                 <button class="modal-btn modal-confirmar" id="modalConfirmar" disabled>Eliminar</button>
@@ -302,22 +313,43 @@
         </div>
     </div>
 
-    <!-- plantas_catalogo primero para que statPlantas funcione -->
     <script src="../js/plantas_catalogo.js"></script>
     <script>history.replaceState(null, '', location.href);</script>
+    <script src="../js/api.js"></script>
     <script src="../js/profile.js"></script>
-    <script>
-        // Mostrar conteo de plantas encontradas en el stat-box
-        const _ids = JSON.parse(localStorage.getItem('plantas_encontradas') || '[]');
-        const _el  = document.getElementById('statPlantas');
-        if (_el) _el.textContent = _ids.length;
-    </script>
     <script src="../js/dialogos.js"></script>
+    <script src="../js/audio.js"></script>
     <script>
+        // ── Bienvenida al cargar ──
         window.addEventListener('load', () => {
             DialogoSistema.mostrarConDelay('perfil_bienvenida', 1000);
         });
+
+        // ── perfil_guardado: observar el toast ──
+        const _toast = document.getElementById('toast');
+        const _toastMsg = document.getElementById('toastMsg');
+        new MutationObserver(() => {
+            if (_toast.classList.contains('show') || _toast.style.opacity === '1') {
+                const msg = _toastMsg ? _toastMsg.textContent.toLowerCase() : '';
+                // Solo disparar si es un guardado exitoso, no un error
+                if (!msg.includes('error') && !msg.includes('incorrecto')) {
+                    DialogoSistema.mostrar('perfil_guardado');
+                }
+            }
+        }).observe(_toast, { attributes: true, attributeFilter: ['class', 'style'] });
+
+        // ── perfil_avatar_cambiado: detectar cuando cambia avatarImg src ──
+        const _avatarImg = document.getElementById('avatarImg');
+        let   _avatarSrcInicial = '';
+        window.addEventListener('load', () => {
+            setTimeout(() => { _avatarSrcInicial = _avatarImg.src; }, 1500);
+        });
+        new MutationObserver(() => {
+            if (_avatarSrcInicial && _avatarImg.src !== _avatarSrcInicial) {
+                _avatarSrcInicial = _avatarImg.src;
+                DialogoSistema.mostrar('perfil_avatar_cambiado');
+            }
+        }).observe(_avatarImg, { attributes: true, attributeFilter: ['src'] });
     </script>
-    <script src="../js/audio.js"></script>
 </body>
 </html>

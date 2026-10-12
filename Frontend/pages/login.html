@@ -96,16 +96,12 @@
                     <span class="linea-deco"></span>
                 </div>
 
-                <!-- Mama Rosa — burbuja manejada por dialogos.js -->
                 <div class="mama-en-card">
-
-                    <!-- Botón regresar — dentro del contenedor de mama -->
                     <a href="#" id="btnRegresar" class="btn-regresar" aria-label="Volver">
                         <svg viewBox="0 0 24 24" fill="none">
                             <path d="M19 12H5M5 12l7-7M5 12l7 7" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
                         </svg>
                     </a>
-
                     <div class="mama-dos-frames">
                         <img src="../images/mama/mama_frame1.png" class="mama-frame mama-f1" alt="Mama Rosa">
                         <img src="../images/mama/mama_frame2.png" class="mama-frame mama-f2" alt="">
@@ -163,7 +159,7 @@
                         <span class="check-custom"></span>
                         <span class="check-texto">Recordarme</span>
                     </label>
-                    <a href="recuperar.html" class="link-recuperar">¿Olvidaste tu contraseña?</a>
+                    <a href="#" id="linkRecuperar" class="link-recuperar">¿Olvidaste tu contraseña?</a>
                 </div>
 
                 <button type="submit" class="btn-login" id="btnLogin">
@@ -195,21 +191,49 @@
         </div>
     </main>
 
+    <script src="../js/api.js"></script>
     <script src="../js/login.js"></script>
     <script src="../js/dialogos.js"></script>
+    <script src="../js/audio.js"></script>
     <script>
-        // ── Botón regresar — siempre vuelve al index ──
+        // ── Botón regresar ──
         document.getElementById('btnRegresar').addEventListener('click', (e) => {
             e.preventDefault();
             window.location.href = '../index.html';
         });
 
-        // ── Diálogo de bienvenida ──
+        // ── Diálogo de bienvenida al cargar ──
         window.addEventListener('load', () => {
             DialogoSistema.mostrarConDelay('login_bienvenida', 1000);
         });
 
-        // ── Reinicia animaciones al volver con el botón atrás del navegador ──
+        // ── Diálogo al enviar el formulario (cargando) ──
+        document.getElementById('loginForm').addEventListener('submit', () => {
+            DialogoSistema.mostrar('login_cargando');
+        });
+
+        // ── Diálogo de error — observar cuando aparece el div de error ──
+        // (login.js ya declara "loginError"; aquí se usa otro nombre para no chocar)
+        const _cajaErrorLogin = document.getElementById('loginError');
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach((m) => {
+                if (m.type === 'attributes' && m.attributeName === 'style') {
+                    if (_cajaErrorLogin.style.display !== 'none') {
+                        DialogoSistema.mostrar('login_error');
+                    }
+                }
+            });
+        });
+        observer.observe(_cajaErrorLogin, { attributes: true });
+
+        // ── ¿Olvidaste tu contraseña? (no hay correo ni SMS: lo resuelve el docente) ──
+        document.getElementById('linkRecuperar').addEventListener('click', (e) => {
+            e.preventDefault();
+            document.getElementById('errorContrasena').textContent =
+                'Pide a tu docente o al administrador de Pastuker que restablezca tu contraseña.';
+        });
+
+        // ── Reinicia animaciones al volver con el botón atrás ──
         window.addEventListener('pageshow', (e) => {
             if (e.persisted) {
                 document.querySelectorAll('.mama-frame').forEach(el => {
@@ -220,6 +244,5 @@
             }
         });
     </script>
-    <script src="../js/audio.js"></script>
 </body>
 </html>

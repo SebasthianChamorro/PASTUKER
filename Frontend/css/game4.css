@@ -1,0 +1,291 @@
+/* ══════════════════════════════════════════════════
+   PASTUKER — game4.css · Ahorcado Ancestral
+   Layout: landscape móvil · guillotina izq | juego der
+══════════════════════════════════════════════════ */
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+html, body {
+    width:100%; height:100%; overflow:hidden;
+    font-family:'Nunito', sans-serif;
+    background:#1a0e05;
+    touch-action:manipulation;
+    -webkit-user-select:none; user-select:none;
+}
+
+/* ── FONDO ── */
+#maloca-bg {
+    position:fixed; inset:0; z-index:0;
+    background:url('../images/game3/sprites/maloka.png') center/cover no-repeat;
+    image-rendering:pixelated; filter:brightness(.45);
+}
+#maloca-overlay {
+    position:fixed; inset:0; z-index:1;
+    background:linear-gradient(to bottom,
+        rgba(10,6,3,.15) 0%, rgba(10,6,3,.08) 35%,
+        rgba(10,6,3,.55) 72%, rgba(10,6,3,.98) 100%);
+}
+
+/* ── GIRAR ── */
+#rotate-msg {
+    display:none; position:fixed; inset:0; z-index:9999;
+    background:#1a0e05; flex-direction:column;
+    align-items:center; justify-content:center; gap:16px;
+}
+@media (orientation:portrait) { #rotate-msg { display:flex; } }
+.rot-ph { font-size:56px; animation:giro 2.5s ease-in-out infinite; }
+@keyframes giro { 0%,100%{transform:rotate(0)} 40%,60%{transform:rotate(90deg)} }
+.rot-txt { font-family:'Press Start 2P',monospace; font-size:9px;
+    color:#d4af37; line-height:2.2; text-align:center; }
+
+/* ══ APP ══ */
+#app {
+    position:fixed; inset:0; z-index:10;
+    display:flex; flex-direction:column;
+}
+
+/* ── TOPBAR ── */
+#topbar {
+    flex-shrink:0; height:36px;
+    display:flex; align-items:center; gap:10px; padding:0 12px;
+    background:rgba(8,4,1,.97); border-bottom:1px solid rgba(212,175,55,.2);
+}
+#btn-salir {
+    font-family:'Press Start 2P',monospace; font-size:7px;
+    color:#d4af37; text-decoration:none; white-space:nowrap;
+}
+#prog-bar { flex:1; height:5px; background:rgba(255,255,255,.1); border-radius:3px; overflow:hidden; }
+#prog-bar-fill { height:100%; width:0%; background:linear-gradient(to right,#8b4513,#d4af37); border-radius:3px; transition:width .5s; }
+#nav-info { font-family:'Press Start 2P',monospace; font-size:5px;
+    color:rgba(212,175,55,.5); white-space:nowrap; line-height:1.6; text-align:right; }
+
+/* ══ GAME AREA: 2 columnas 50/50 ══ */
+#game-area {
+    flex:1; min-height:0;
+    display:grid;
+    grid-template-columns: 50% 50%;
+}
+
+/* ─── COLUMNA IZQUIERDA ─── */
+#col-left {
+    display:flex; flex-direction:column;
+    align-items:center;
+    justify-content:space-between;
+    padding:6px 8px;
+    background:rgba(0,0,0,.45);
+    border-right:1px solid rgba(212,175,55,.12);
+    overflow:hidden;
+}
+
+#nivel-badge {
+    flex-shrink:0;
+    display:flex; align-items:center; gap:8px;
+    background:rgba(212,175,55,.08);
+    border:1px solid rgba(212,175,55,.2);
+    border-radius:6px; padding:4px 10px; width:100%;
+    justify-content:center;
+}
+#nivel-num { font-family:'Press Start 2P',monospace; font-size:8px; color:#d4af37; }
+#nivel-dif { font-family:'Press Start 2P',monospace; font-size:6px; color:rgba(212,175,55,.45); }
+
+/* Guillotina — ocupa TODO el espacio disponible */
+#char-wrap {
+    flex:1; min-height:0;
+    display:flex; align-items:center; justify-content:center;
+    width:100%; padding:4px;
+}
+#char-img {
+    /* Fuerza que llene el alto y ancho disponibles */
+    height:100%;
+    width:100%;
+    object-fit:contain;
+    image-rendering:pixelated;
+    filter:drop-shadow(0 6px 30px rgba(212,175,55,.4));
+    transition:opacity .2s;
+}
+
+/* Vidas */
+#vidas-wrap {
+    flex-shrink:0; width:100%;
+    display:flex; flex-direction:column; align-items:center; gap:4px;
+    padding:4px 0 2px;
+}
+#vidas-lbl { font-family:'Press Start 2P',monospace; font-size:6px; color:rgba(212,175,55,.4); }
+#vidas-bubbles { display:flex; gap:6px; flex-wrap:wrap; justify-content:center; }
+.vida-burbuja {
+    width:14px; height:14px; border-radius:50%;
+    background:#2d8b4a; border:1.5px solid rgba(45,139,74,.5);
+    transition:background .3s, transform .2s;
+}
+.vida-burbuja.perdida {
+    background:#dc3545; border-color:rgba(220,53,69,.5);
+    transform:scale(.82);
+}
+
+/* ─── COLUMNA DERECHA ─── */
+#col-right {
+    display:flex; flex-direction:column;
+    align-items:center; justify-content:space-evenly;
+    padding:6px 14px; gap:5px; overflow:hidden;
+}
+
+/* Pista — texto más grande */
+#pista-box {
+    flex-shrink:0; width:100%;
+    background:rgba(212,175,55,.07);
+    border:1px solid rgba(212,175,55,.2);
+    border-radius:8px; padding:8px 14px;
+    display:flex; align-items:flex-start; gap:8px;
+}
+#pista-label {
+    font-family:'Press Start 2P',monospace; font-size:8px;
+    color:rgba(212,175,55,.65); white-space:nowrap; padding-top:2px;
+}
+#pista-txt {
+    font-size:clamp(13px,1.9vw,17px); color:rgba(255,255,255,.85);
+    font-weight:700; line-height:1.5;
+    overflow:hidden; display:-webkit-box;
+    -webkit-line-clamp:2; line-clamp:2; -webkit-box-orient:vertical;
+}
+
+/* Palabra */
+#word-display {
+    flex-shrink:0;
+    display:flex; flex-wrap:wrap;
+    align-items:center; justify-content:center;
+    gap:14px 10px; min-height:70px; width:100%;
+}
+.letra-slot { display:flex; flex-direction:column; align-items:center; gap:6px; min-width:30px; }
+.letra-char {
+    font-family:'Press Start 2P',monospace;
+    font-size:clamp(22px,4vw,36px);
+    color:#d4af37; min-width:30px; text-align:center;
+    animation:aparecer .2s ease;
+}
+@keyframes aparecer { from{transform:scale(1.5);opacity:0} to{transform:scale(1);opacity:1} }
+.letra-linea {
+    width:100%; height:3px;
+    background:rgba(212,175,55,.4); border-radius:2px; min-width:30px;
+}
+.espacio-gap { width:22px; }
+
+/* Letras incorrectas */
+#wrong-wrap {
+    flex-shrink:0; width:100%;
+    display:flex; align-items:center; gap:8px;
+    flex-wrap:wrap; justify-content:center; min-height:22px;
+}
+#wrong-lbl { font-family:'Press Start 2P',monospace; font-size:7px; color:rgba(255,100,100,.5); white-space:nowrap; }
+#wrong-letters { display:flex; gap:8px; flex-wrap:wrap; justify-content:center; }
+.wrong-letra {
+    font-family:'Press Start 2P',monospace; font-size:13px;
+    color:#ff7070; animation:wl .2s ease;
+}
+@keyframes wl { from{transform:scale(1.6)} to{transform:scale(1)} }
+
+/* Teclado */
+#teclado {
+    flex-shrink:0; width:100%;
+    display:flex; flex-direction:column; align-items:center; gap:8px;
+}
+.teclado-fila { display:flex; gap:7px; justify-content:center; }
+.tecla {
+    font-family:'Press Start 2P',monospace;
+    font-size:clamp(13px,2.2vw,18px);
+    padding:12px 14px; min-width:clamp(44px,6.5vw,62px);
+    background:rgba(212,175,55,.1);
+    border:2px solid rgba(212,175,55,.35);
+    border-radius:9px; color:#d4af37;
+    cursor:pointer; transition:all .12s;
+    touch-action:manipulation;
+}
+.tecla:not(:disabled):hover  { background:rgba(212,175,55,.24); border-color:rgba(212,175,55,.7); transform:translateY(-2px); }
+.tecla:not(:disabled):active { transform:scale(.9); }
+.tecla:disabled { opacity:.22; cursor:default; pointer-events:none; }
+.tecla.acertada { background:rgba(45,139,74,.3);  border-color:#2d8b4a; color:#69db7c; }
+.tecla.fallada  { background:rgba(220,53,69,.2);   border-color:#dc3545; color:#ff6b6b; }
+
+/* ─── DIALOG ─── */
+#mama-bubble {
+    flex-shrink:0; height:68px;
+    background:rgba(5,2,0,.99); border-top:2px solid rgba(212,175,55,.3);
+    display:flex; align-items:center; gap:10px; padding:6px 14px;
+    overflow:hidden;
+}
+.bubble-header { flex-shrink:0; display:flex; align-items:center; gap:6px; }
+.bubble-avatar { width:20px; height:auto; image-rendering:pixelated; border-radius:3px; }
+.bubble-name { font-family:'Press Start 2P',monospace; font-size:7px; color:#d4af37; white-space:nowrap; }
+#mama-text {
+    flex:1; font-size:clamp(11px,1.6vw,14px);
+    color:rgba(255,255,255,.88); font-weight:700; line-height:1.5;
+    overflow:hidden; display:-webkit-box;
+    -webkit-line-clamp:2; line-clamp:2; -webkit-box-orient:vertical;
+}
+
+/* ══ OVERLAYS ══ */
+@keyframes pop   { from{opacity:0;transform:scale(.85) translateY(16px)} to{opacity:1;transform:scale(1) translateY(0)} }
+@keyframes shake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-8px)} 40%{transform:translateX(8px)} 60%{transform:translateX(-5px)} 80%{transform:translateX(5px)} }
+.shake { animation:shake .4s ease; }
+
+#intro-ov, #win-ov, #lose-ov, #result-ov {
+    display:none; position:fixed; inset:0; z-index:500;
+    background:rgba(0,0,0,.93); backdrop-filter:blur(8px);
+    align-items:center; justify-content:center; padding:16px;
+}
+#intro-ov.on, #win-ov.on, #lose-ov.on { display:flex; }
+#result-ov.on { display:flex; z-index:600; }
+
+#intro-card, #win-card, #lose-card, #result-card {
+    background:rgba(10,6,3,.99);
+    border-radius:20px; padding:clamp(14px,3vw,28px);
+    max-width:420px; width:100%; text-align:center;
+    display:flex; flex-direction:column; align-items:center; gap:11px;
+    animation:pop .4s cubic-bezier(.34,1.56,.64,1);
+}
+#intro-card  { border:2px solid rgba(212,175,55,.5); }
+#win-card    { border:2px solid rgba(45,139,74,.5);  max-width:380px; }
+#lose-card   { border:2px solid rgba(220,53,69,.4);  max-width:400px; }
+#result-card { border:2px solid rgba(212,175,55,.5); }
+
+/* Intro */
+#intro-nivel-lbl { font-family:'Press Start 2P',monospace; font-size:8px; color:rgba(212,175,55,.5); }
+#intro-titulo { font-family:'Press Start 2P',monospace; font-size:clamp(10px,1.8vw,14px); color:#d4af37; line-height:1.5; }
+#intro-desc { font-size:12px; color:rgba(255,255,255,.72); font-weight:700; line-height:1.55; }
+#intro-dif  { font-family:'Press Start 2P',monospace; font-size:7px; color:rgba(212,175,55,.45); }
+#intro-btn  { padding:11px 22px; background:linear-gradient(135deg,#d4af37,#a07a20);
+    border:none; border-radius:10px; font-family:'Press Start 2P',monospace;
+    font-size:9px; color:#1a0e05; cursor:pointer; }
+
+/* Win */
+#win-emo    { font-size:50px; }
+#win-title  { font-family:'Press Start 2P',monospace; font-size:clamp(10px,1.8vw,13px); color:#69db7c; }
+#win-palabra{ font-family:'Press Start 2P',monospace; font-size:clamp(8px,1.4vw,11px); color:#d4af37; line-height:1.6; }
+#win-xp     { font-family:'Press Start 2P',monospace; font-size:13px; color:#f0d060; }
+#win-btn    { padding:10px 20px; background:linear-gradient(135deg,#2d8b4a,#1a6b35);
+    border:none; border-radius:10px; font-family:'Press Start 2P',monospace;
+    font-size:8px; color:#fff; cursor:pointer; }
+
+/* Lose */
+#lose-char  { width:90px; height:120px; image-rendering:pixelated; }
+#lose-title { font-family:'Press Start 2P',monospace; font-size:clamp(10px,1.8vw,13px); color:#ff6b6b; }
+#lose-desc  { font-size:11px; color:rgba(255,255,255,.6); font-weight:700; }
+#lose-resp  { font-family:'Press Start 2P',monospace; font-size:clamp(7px,1.2vw,10px); color:#d4af37; line-height:1.6; }
+#lose-btns  { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
+#lose-retry { padding:10px 16px; background:linear-gradient(135deg,#d4af37,#a07a20);
+    border:none; border-radius:10px; font-family:'Press Start 2P',monospace;
+    font-size:7px; color:#1a0e05; cursor:pointer; }
+#lose-skip  { padding:10px 16px; background:rgba(212,175,55,.1);
+    border:1.5px solid rgba(212,175,55,.3); border-radius:10px;
+    font-family:'Press Start 2P',monospace; font-size:7px; color:#d4af37; cursor:pointer; }
+
+/* Result */
+#res-emo   { font-size:50px; }
+#res-tit   { font-family:'Press Start 2P',monospace; font-size:clamp(9px,1.6vw,12px); color:#d4af37; }
+.res-stats { display:flex; gap:12px; justify-content:center; width:100%; }
+.res-box   { background:rgba(212,175,55,.07); border:1px solid rgba(212,175,55,.22);
+    border-radius:10px; padding:10px 14px; flex:1; }
+.res-lbl   { font-family:'Press Start 2P',monospace; font-size:6px; color:rgba(212,175,55,.55); margin-bottom:5px; }
+.res-num   { font-family:'Press Start 2P',monospace; font-size:clamp(14px,2.2vw,20px); color:#d4af37; }
+#res-desc  { font-size:11px; color:rgba(255,255,255,.55); font-weight:700; line-height:1.65; }
+.res-btn   { padding:11px 20px; border-radius:10px; background:linear-gradient(135deg,#d4af37,#a07a20);
+    border:none; font-family:'Press Start 2P',monospace;
+    font-size:clamp(7px,1.2vw,9px); color:#1a0e05; cursor:pointer; }

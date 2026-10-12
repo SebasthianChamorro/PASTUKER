@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#1a0e05">
+    <title>Pastuker — La Maloca</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="stylesheet" href="../css/game3.css">
+    <link rel="stylesheet" href="../css/dialogos.css">
+    <script src="../js/dialogos.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* ── Topbar: asegurar que muestre el botón mute ── */
+        #topbar {
+            display:flex !important;
+            align-items:center !important;
+            gap:8px !important;
+            overflow:visible !important;
+        }
+
+        /* ── Botón mute ── */
+        #btn-mute {
+            flex-shrink:0 !important;
+            background:rgba(212,175,55,.12);
+            border:1.5px solid rgba(212,175,55,.35);
+            border-radius:6px;
+            color:#d4af37;
+            font-size:15px;
+            width:28px; height:22px;
+            cursor:pointer;
+            display:flex !important;
+            align-items:center; justify-content:center;
+            transition:background .15s;
+            padding:0;
+            line-height:1;
+        }
+        #btn-mute:active { background:rgba(212,175,55,.3); }
+
+        /* ── Puz-header: asegurar que muestre las vidas ── */
+        #puz-header {
+            display:flex !important;
+            align-items:center !important;
+            gap:8px !important;
+            overflow:visible !important;
+        }
+
+        /* ── Vidas en puzzle ── */
+        #puz-vidas-wrap {
+            display:flex !important;
+            align-items:center;
+            gap:5px;
+            flex-shrink:0;
+        }
+        .puz-vida {
+            display:block !important;
+            width:12px; height:12px;
+            border-radius:50%;
+            background:#2d8b4a;
+            border:1.5px solid rgba(45,139,74,.6);
+            transition:background .25s, transform .2s;
+        }
+        .puz-vida.perdida {
+            background:#dc3545 !important;
+            border-color:rgba(220,53,69,.6);
+            transform:scale(.8);
+        }
+
+        /* ── Panel fallado ── */
+        #puz-fail-panel {
+            position:absolute; inset:0;
+            display:flex !important;
+            flex-direction:column;
+            align-items:center; justify-content:center;
+            gap:12px; padding:16px;
+            opacity:0; pointer-events:none;
+            transition:opacity .25s;
+            background:rgba(5,2,0,.85);
+        }
+        #puz-fail-panel.on {
+            opacity:1 !important;
+            pointer-events:all !important;
+        }
+        .puz-fail-emo { font-size:48px; }
+        .puz-fail-tit {
+            font-family:'Press Start 2P',monospace;
+            font-size:clamp(9px,1.5vw,12px);
+            color:#ff6b6b; text-align:center; line-height:1.6;
+        }
+        .puz-fail-sub {
+            font-size:12px; color:rgba(255,255,255,.6);
+            font-weight:700; text-align:center; max-width:380px;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="maloca-bg"></div>
+    <div id="maloca-overlay"></div>
+
+    <div id="rotate-msg">
+        <span class="rot-ph">📱</span>
+        <p class="rot-txt">Gira tu dispositivo<br><br>La Maloca necesita<br>modo horizontal</p>
+    </div>
+
+    <div id="puz-ghost"></div>
+
+    <div id="app">
+
+        <!-- TOPBAR -->
+        <div id="topbar">
+            <a id="btn-salir" href="juegos.html">← Salir</a>
+            <div id="prog-bar"><div id="prog-bar-fill"></div></div>
+            <div id="nav-progress">Paso 1/20<br>📖 Info</div>
+            <!-- BOTÓN MUTE -->
+            <button id="btn-mute" onclick="toggleMute()" title="Silenciar música">🔊</button>
+        </div>
+
+        <!-- ÁREA CENTRAL -->
+        <div id="content-area">
+            <div class="char-col left-col" id="spin-col">
+                <img id="spin-img" class="char-img"
+                     src="../images/game3/characters-spinning/character_men/character_front.png"
+                     alt="Personaje">
+                <p id="spin-label" class="char-lbl">Hombre<br>Pasto</p>
+            </div>
+            <div id="center-col">
+                <div id="img-wrap">
+                    <img id="real-photo" src="../images/game3/real_images/mandala_real.jpg" alt="">
+                </div>
+                <div class="item-footer">
+                    <img id="pixel-art" src="../images/game3/sprites/mandala.png" alt="">
+                    <div class="item-text-wrap">
+                        <span id="card-badge">🏡 La Maloca</span>
+                        <p id="item-titulo">La Maloca</p>
+                        <p id="item-subtitulo">Saberes del Pueblo Pasto</p>
+                    </div>
+                </div>
+                <p id="item-desc">Bienvenido al espacio sagrado del Pueblo Pasto.</p>
+            </div>
+            <div class="char-col right-col" id="mama-col">
+                <img id="mama-img" class="char-img"
+                     src="../images/mama/mama_frame1.png" alt="Mama Rosa">
+                <p class="char-lbl">Mama<br>Rosa</p>
+            </div>
+        </div>
+
+        <!-- DIALOG BOX -->
+        <div id="mama-bubble">
+            <div class="bubble-header">
+                <img class="bubble-avatar" src="../images/mama/mama_frame1.png" alt="">
+                <span class="bubble-name">Mama Rosa</span>
+            </div>
+            <div class="bubble-body">
+                <p id="mama-text">¡Bienvenido/a! Soy Mama Rosa, sabedora ancestral del Pueblo Pasto.</p>
+                <div class="nav-btns">
+                    <button id="btn-siguiente" class="nav-btn" onclick="navSiguiente()">Siguiente ▶</button>
+                    <button id="btn-anterior"  class="nav-btn" onclick="navAnterior()" disabled>◀ Anterior</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ══ PUZZLE OVERLAY ══ -->
+    <div id="puzzle-ov">
+
+        <!-- Header puzzle: paso + progreso + dificultad + VIDAS -->
+        <div id="puz-header">
+            <span id="puz-step">🧩 Paso 1/7</span>
+            <div id="puz-prog-bar"><div id="puz-prog-fill"></div></div>
+            <!-- VIDAS DEL PUZZLE -->
+            <div id="puz-vidas-wrap"></div>
+            <span id="puz-diff">⭐ Fácil</span>
+        </div>
+
+        <!-- Main -->
+        <div id="puz-main">
+
+            <!-- Panel intro -->
+            <div id="puz-intro-panel" class="puz-panel on">
+                <div id="puz-preview"><img id="puz-prev-img" src="" alt=""></div>
+                <div id="puz-intro-info">
+                    <p id="puz-ibadge"></p>
+                    <h3 id="puz-ititle"></h3>
+                    <p id="puz-idesc"></p>
+                    <p id="puz-idiff"></p>
+                </div>
+            </div>
+
+            <!-- Panel juego -->
+            <div id="puz-game-panel" class="puz-panel">
+                <div id="puz-board-area">
+                    <p class="puz-area-lbl">🧩 TABLERO</p>
+                    <div id="puz-board"></div>
+                    <p id="puz-count">0/0 piezas</p>
+                </div>
+                <div id="puz-bank-area">
+                    <p class="puz-area-lbl">✋ PIEZAS — arrastra al tablero</p>
+                    <div id="puz-bank"></div>
+                </div>
+            </div>
+
+            <!-- Panel completado -->
+            <div id="puz-done-panel" class="puz-panel">
+                <div class="puz-done-emo" id="puz-done-emo">🎉</div>
+                <p class="puz-done-tit" id="puz-done-tit">¡Paso completado!</p>
+                <p class="puz-done-sub" id="puz-done-sub"></p>
+            </div>
+
+            <!-- Panel fallado (sin vidas) -->
+            <div id="puz-fail-panel">
+                <div class="puz-fail-emo">💔</div>
+                <p class="puz-fail-tit" id="puz-fail-tit">¡Sin intentos!</p>
+                <p class="puz-fail-sub" id="puz-fail-sub">No te rindas, inténtalo de nuevo.</p>
+            </div>
+
+        </div>
+
+        <!-- Footer -->
+        <div id="puz-footer">
+            <img id="puz-av" src="../images/mama/mama_frame1.png" alt="">
+            <p id="puz-mama-text">¡Empecemos!</p>
+            <div class="puz-btns">
+                <button id="puz-btn-pri" class="pbtn pri" onclick="puzAccion()">¡Armar! ▶</button>
+                <button id="puz-btn-sec" class="pbtn sec" onclick="puzSaltar()">Saltar →</button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- RESULTADO -->
+    <div id="res-ov">
+        <div class="res-card">
+            <div id="re">🏆</div>
+            <p id="rt">Título</p>
+            <div class="score-grid">
+                <div class="score-box">
+                    <p class="score-lbl">Rompecabezas</p>
+                    <p class="score-num" id="score-puzzles">0/7</p>
+                </div>
+                <div class="score-box">
+                    <p class="score-lbl">XP ganado</p>
+                    <p class="score-num" id="score-xp">0 XP</p>
+                </div>
+            </div>
+            <div id="score-total-wrap"><span id="score-total">0</span> / 350 XP</div>
+            <p id="rd">Descripción</p>
+            <button class="res-btn" onclick="finalizarJuego3()">Volver al inicio ✦</button>
+        </div>
+    </div>
+
+    <script src="../js/game3.js"></script>
+</body>
+</html>

@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1a4a2e">
+    <title>Pastuker — Tratamiento de datos</title>
+    <link rel="manifest" href="../manifest.json">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root { --dorado:#d4af37; --dorado-claro:#f0d060; --verde:#1a4a2e; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Nunito', sans-serif; background: linear-gradient(180deg,#0f2e1c,#1a4a2e 60%,#12331f);
+               color: rgba(255,255,255,.88); min-height: 100vh; padding: 16px; }
+        .card { max-width: 640px; margin: 0 auto; background: rgba(8,24,14,.78); border: 1.5px solid rgba(212,175,55,.35);
+                border-radius: 18px; padding: 22px 18px 28px; display: flex; flex-direction: column; gap: 14px; }
+        h1 { font-family: 'Press Start 2P', monospace; font-size: 13px; color: var(--dorado-claro); line-height: 1.7; text-align: center; }
+        h2 { font-family: 'Press Start 2P', monospace; font-size: 9px; color: var(--dorado); line-height: 1.7; margin-top: 6px; }
+        p, li { font-size: 14px; line-height: 1.65; }
+        ul { padding-left: 20px; display: flex; flex-direction: column; gap: 4px; }
+        .volver { color: var(--dorado-claro); font-weight: 700; text-decoration: none; font-size: 14px; }
+        .nota { font-size: 12px; color: rgba(255,255,255,.55); }
+        .aceptar { display: none; flex-direction: column; gap: 10px; padding: 14px; border-radius: 12px;
+                   border: 1.5px solid var(--dorado); background: rgba(212,175,55,.08); }
+        .aceptar.on { display: flex; }
+        .aceptar label { display: flex; gap: 10px; align-items: flex-start; font-size: 13px; cursor: pointer; }
+        .aceptar input { margin-top: 3px; width: 18px; height: 18px; accent-color: var(--dorado); flex-shrink: 0; }
+        .btn { padding: 12px; border-radius: 10px; border: 1.5px solid var(--dorado); background: rgba(45,107,74,.7);
+               color: var(--dorado-claro); font-family: 'Press Start 2P', monospace; font-size: 9px; cursor: pointer; }
+        .btn:disabled { opacity: .5; cursor: not-allowed; }
+        .err { color: #ff8a8a; font-size: 12px; min-height: 16px; }
+        .datos { white-space: pre-wrap; font-size: 11px; background: rgba(0,0,0,.35); border-radius: 8px; padding: 10px; display: none; }
+    </style>
+</head>
+<body>
+<main class="card">
+    <a class="volver" href="javascript:history.length > 1 ? history.back() : location.replace('menugeneral.html')">← Volver</a>
+    <h1>Política de tratamiento de datos personales</h1>
+
+    <!-- Se muestra cuando una cuenta antigua debe dar la autorización (login.js → ?aceptar=1) -->
+    <section class="aceptar" id="cajaAceptar">
+        <p><strong>Antes de seguir jugando</strong> necesitamos tu autorización. Léela con tu madre, padre o acudiente.</p>
+        <label><input type="checkbox" id="chkDatos"> He leído y acepto esta política de tratamiento de datos.</label>
+        <label><input type="checkbox" id="chkAcudiente"> Soy menor de edad y mi madre, padre o acudiente conoce y autoriza el uso de mis datos (o soy mayor de 18 años).</label>
+        <span class="err" id="errAceptar"></span>
+        <button class="btn" id="btnAceptar" disabled>Aceptar y continuar</button>
+    </section>
+
+    <p class="nota">Versión 2026-10 · Marco legal: Ley 1581 de 2012 (protección de datos personales), Decreto 1377 de 2013
+        (compilado en el Decreto 1074 de 2015) y Ley 1098 de 2006 (Código de la Infancia y la Adolescencia).</p>
+
+    <h2>1. Responsable</h2>
+    <p>[Nombre de la institución o del equipo responsable del proyecto Pastuker] —
+        contacto: [correo o teléfono de contacto]. <span class="nota">(Completar antes de publicar.)</span></p>
+
+    <h2>2. Qué datos guardamos</h2>
+    <ul>
+        <li><strong>Nombre</strong> y <strong>teléfono</strong>: para identificar tu cuenta. El teléfono es tu usuario para entrar.</li>
+        <li><strong>Género</strong> (puedes elegir “Prefiero no decirlo”): solo para escoger el personaje del juego.</li>
+        <li><strong>Contraseña</strong>: nunca se guarda en texto; se guarda cifrada con PBKDF2 y sal aleatoria.</li>
+        <li><strong>Avatar</strong> y <strong>progreso</strong>: XP, plantas encontradas, gemas y mundos completados.</li>
+        <li>La fecha en que se dio esta autorización.</li>
+    </ul>
+    <p>No pedimos correo, dirección, fotos, ubicación ni documento de identidad.</p>
+
+    <h2>3. Para qué los usamos</h2>
+    <ul>
+        <li>Crear tu cuenta y dejarte entrar, también sin internet en tu propio celular.</li>
+        <li>Guardar tu progreso para que no se pierda si cambias de celular.</li>
+        <li>Mostrar el ranking. En el ranking <strong>solo aparece tu primer nombre y la inicial del apellido</strong>, tu avatar y tus puntos. Tu teléfono nunca se muestra.</li>
+    </ul>
+    <p>Tus datos no se venden, no se comparten con terceros y no se usan para publicidad.</p>
+
+    <h2>4. Niñas, niños y adolescentes</h2>
+    <p>Pastuker está pensado para jugadores de 12 a 17 años. Por eso el registro exige que la madre, el padre o el acudiente
+        conozca y autorice el uso de los datos, se recoge solo lo mínimo necesario y el uso responde siempre al interés
+        superior del menor y al respeto de sus derechos fundamentales.</p>
+
+    <h2>5. Tus derechos</h2>
+    <ul>
+        <li><strong>Conocer</strong> tus datos: botón “Ver mis datos” más abajo.</li>
+        <li><strong>Actualizar y corregir</strong>: desde Perfil puedes cambiar tu nombre, contraseña y avatar.</li>
+        <li><strong>Suprimir</strong>: en Perfil → “Eliminar Cuenta” se borran del servidor tu cuenta y todo tu progreso.</li>
+        <li><strong>Revocar la autorización</strong>: eliminando la cuenta o escribiendo al contacto del responsable.</li>
+        <li>Presentar quejas ante la Superintendencia de Industria y Comercio (SIC).</li>
+    </ul>
+
+    <h2>6. Seguridad y conservación</h2>
+    <p>La comunicación con el servidor debe hacerse por HTTPS. Las sesiones vencen a los 30 días y se bloquea el acceso
+        tras 5 intentos fallidos. En tu celular queda una copia de tu progreso para jugar sin internet; al eliminar la cuenta
+        también se borra. Los datos se conservan mientras la cuenta esté activa.</p>
+
+    <button class="btn" id="btnMisDatos">Ver mis datos</button>
+    <pre class="datos" id="misDatos"></pre>
+</main>
+
+<script src="../js/api.js"></script>
+<script>
+    'use strict';
+    const pedirAceptacion = new URLSearchParams(location.search).get('aceptar') === '1';
+    const caja = document.getElementById('cajaAceptar');
+    const chk1 = document.getElementById('chkDatos');
+    const chk2 = document.getElementById('chkAcudiente');
+    const btnA = document.getElementById('btnAceptar');
+
+    if (pedirAceptacion) caja.classList.add('on');
+    [chk1, chk2].forEach(c => c.addEventListener('change', () => { btnA.disabled = !(chk1.checked && chk2.checked); }));
+
+    btnA.addEventListener('click', async () => {
+        const err = document.getElementById('errAceptar');
+        err.textContent = '';
+        try {
+            const r = await Pastuker.api('/api/consentimiento', {
+                method: 'POST', body: { acepta_datos: true, autoriza_acudiente: true },
+            });
+            if (!r.ok) { err.textContent = r.data?.msg || 'No se pudo guardar la autorización'; return; }
+            location.replace('menugeneral.html');
+        } catch {
+            err.textContent = 'Necesitas internet para registrar la autorización.';
+        }
+    });
+
+    document.getElementById('btnMisDatos').addEventListener('click', async () => {
+        const pre = document.getElementById('misDatos');
+        pre.style.display = 'block';
+        if (!Pastuker.estaConectado()) {
+            pre.textContent = 'Inicia sesión con internet para consultar los datos guardados en el servidor.\n\n' +
+                'Datos guardados en este celular:\n' + JSON.stringify({
+                    nombre: Pastuker.LS.get('usuario_nombre'), telefono: Pastuker.LS.get('usuario_telefono'),
+                    genero: Pastuker.LS.get('usuario_genero'), progreso: Pastuker.leerProgresoLocal(),
+                }, null, 2);
+            return;
+        }
+        try {
+            const r = await Pastuker.api('/api/mis-datos');
+            pre.textContent = r.ok ? JSON.stringify(r.data.datos, null, 2) : (r.data?.msg || 'No se pudo consultar');
+        } catch {
+            pre.textContent = 'Sin conexión.';
+        }
+    });
+</script>
+</body>
+</html>

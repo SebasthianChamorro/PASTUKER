@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#1a0e05">
+    <title>Pastuker — Ahorcado Ancestral</title>
+    <link rel="stylesheet" href="../css/dialogos.css">
+    <script src="../js/dialogos.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/game4.css">
+    <style>
+        /* ── Botón mute ── */
+        #btn-mute {
+            flex-shrink:0;
+            background:rgba(212,175,55,.1);
+            border:1.5px solid rgba(212,175,55,.3);
+            border-radius:6px;
+            color:#d4af37;
+            font-size:14px;
+            width:30px; height:22px;
+            cursor:pointer;
+            display:flex; align-items:center; justify-content:center;
+            transition:background .15s;
+        }
+        #btn-mute:active { background:rgba(212,175,55,.25); }
+    </style>
+</head>
+<body>
+
+<div id="maloca-bg"></div>
+<div id="maloca-overlay"></div>
+
+<div id="rotate-msg">
+    <span class="rot-ph">📱</span>
+    <p class="rot-txt">Gira tu dispositivo<br><br>Ahorcado Ancestral<br>necesita horizontal</p>
+</div>
+
+<div id="app">
+
+    <!-- TOPBAR -->
+    <div id="topbar">
+        <a href="juegos.html" id="btn-salir">← Salir</a>
+        <div id="prog-bar"><div id="prog-bar-fill"></div></div>
+        <div id="nav-info">Nivel 1/18<br>🎯 Ahorcado</div>
+        <!-- BOTÓN MUTE -->
+        <button id="btn-mute" onclick="toggleMute()" title="Silenciar música">🔊</button>
+    </div>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <div id="game-area">
+
+        <div id="col-left">
+            <div id="nivel-badge">
+                <span id="nivel-num">Nivel 1</span>
+                <span id="nivel-dif">⭐ Fácil</span>
+            </div>
+            <div id="char-wrap">
+                <img id="char-img" src="" alt="Personaje" draggable="false">
+            </div>
+            <div id="vidas-wrap">
+                <p id="vidas-lbl">Intentos</p>
+                <div id="vidas-bubbles"></div>
+            </div>
+        </div>
+
+        <div id="col-right">
+            <div id="pista-box">
+                <span id="pista-label">💡 Pista:</span>
+                <span id="pista-txt"></span>
+            </div>
+            <div id="word-display"></div>
+            <div id="wrong-wrap">
+                <span id="wrong-lbl">Incorrectas:</span>
+                <div id="wrong-letters"></div>
+            </div>
+            <div id="teclado"></div>
+        </div>
+
+    </div>
+
+    <div id="mama-bubble">
+        <div class="bubble-header">
+            <img class="bubble-avatar" id="bubble-av" src="../images/mama/mama_frame1.png" alt="">
+            <span class="bubble-name">Mama Rosa</span>
+        </div>
+        <p id="mama-text">¡Bienvenido/a al Ahorcado Ancestral del Pueblo Pasto!</p>
+    </div>
+
+</div>
+
+<!-- OVERLAY INTRO -->
+<div id="intro-ov">
+    <div id="intro-card">
+        <p id="intro-nivel-lbl">Nivel 1</p>
+        <h2 id="intro-titulo">¡Ahorcado Ancestral!</h2>
+        <p id="intro-desc"></p>
+        <p id="intro-dif"></p>
+        <button id="intro-btn" onclick="cerrarIntro()">¡Jugar! ▶</button>
+    </div>
+</div>
+
+<!-- OVERLAY GANAR -->
+<div id="win-ov">
+    <div id="win-card">
+        <div id="win-emo">🎉</div>
+        <p id="win-title">¡Correcto!</p>
+        <p id="win-palabra"></p>
+        <p id="win-xp">+50 XP</p>
+        <button id="win-btn" onclick="siguienteNivel()">Siguiente ▶</button>
+    </div>
+</div>
+
+<!-- OVERLAY PERDER -->
+<div id="lose-ov">
+    <div id="lose-card">
+        <img id="lose-char" src="" alt="" draggable="false">
+        <p id="lose-title">¡Lo sentimos!</p>
+        <p id="lose-desc"></p>
+        <p id="lose-resp"></p>
+        <div id="lose-btns">
+            <button id="lose-retry" onclick="reintentar()">🔄 Reintentar</button>
+            <button id="lose-skip"  onclick="siguienteNivel()">Saltar →</button>
+        </div>
+    </div>
+</div>
+
+<!-- OVERLAY RESULTADO FINAL -->
+<div id="result-ov">
+    <div id="result-card">
+        <div id="res-emo">🏆</div>
+        <p id="res-tit"></p>
+        <div class="res-stats">
+            <div class="res-box">
+                <p class="res-lbl">Niveles</p>
+                <p class="res-num" id="res-niveles">0/18</p>
+            </div>
+            <div class="res-box">
+                <p class="res-lbl">XP Total</p>
+                <p class="res-num" id="res-xp">0 XP</p>
+            </div>
+        </div>
+        <p id="res-desc"></p>
+        <button class="res-btn" onclick="volverJuegos()">Volver al inicio ✦</button>
+    </div>
+</div>
+
+<script src="../js/game4.js"></script>
+</body>
+</html>

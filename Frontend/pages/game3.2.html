@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#1a0e05">
+    <title>Pastuker — Sopa Ritual</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="stylesheet" href="../css/game3.2.css">
+    <link rel="stylesheet" href="../css/dialogos.css">
+    <script src="../js/dialogos.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        #topbar {
+            display:flex !important;
+            align-items:center !important;
+            gap:8px !important;
+            overflow:visible !important;
+            padding-top:max(0px, env(safe-area-inset-top));
+        }
+        #btn-mute {
+            flex-shrink:0;
+            background:rgba(212,175,55,.12);
+            border:1.5px solid rgba(212,175,55,.35);
+            border-radius:6px;
+            color:#d4af37;
+            font-size:15px;
+            width:28px;
+            height:22px;
+            cursor:pointer;
+            display:flex !important;
+            align-items:center;
+            justify-content:center;
+            transition:background .15s;
+            padding:0;
+            line-height:1;
+        }
+        #btn-mute:active { background:rgba(212,175,55,.3); }
+        #sopa-vidas-wrap {
+            display:flex !important;
+            align-items:center;
+            gap:5px;
+            flex-shrink:0;
+        }
+        .sopa-vida {
+            display:block !important;
+            width:12px;
+            height:12px;
+            border-radius:50%;
+            background:#2d8b4a;
+            border:1.5px solid rgba(45,139,74,.6);
+            transition:background .25s, transform .2s;
+        }
+        .sopa-vida.perdida {
+            background:#dc3545 !important;
+            border-color:rgba(220,53,69,.6);
+            transform:scale(.8);
+        }
+    </style>
+</head>
+<body>
+    <div id="maloca-bg"></div>
+    <div id="maloca-overlay"></div>
+
+    <div id="rotate-msg">
+        <span class="rot-ph">📱</span>
+        <p class="rot-txt">Gira tu dispositivo<br><br>La Sopa Ritual necesita<br>modo horizontal</p>
+    </div>
+
+    <div id="app">
+        <div id="topbar">
+            <a id="btn-salir" href="game3.html">← Volver</a>
+            <div id="prog-bar"><div id="prog-bar-fill"></div></div>
+            <div id="nav-progress">0/8<br>🔎 Sopa</div>
+            <button id="btn-mute" onclick="toggleMute()" title="Silenciar música">🔊</button>
+        </div>
+
+        <div id="content-area">
+            <div id="left-col">
+                <div id="sopa-card">
+                    <div id="sopa-header-mini">
+                        <span id="sopa-title-mini">🔎 Sopa Ritual</span>
+                        <span id="sopa-timer">⏳ 30s</span>
+                    </div>
+                    <div id="sopa-grid-wrap">
+                        <div id="sopa-grid"></div>
+                    </div>
+                    <p id="sopa-current">Busca: MÁNDALA</p>
+                </div>
+            </div>
+
+            <div id="right-col">
+                <div id="goals-box">
+                    <p class="panel-title">📜 Saberes a encontrar</p>
+                    <div id="goal-list"></div>
+                </div>
+
+                <div id="status-box">
+                    <div class="status-row">
+                        <span class="status-lbl">Intentos</span>
+                        <div id="sopa-vidas-wrap"></div>
+                    </div>
+                    <div class="status-row">
+                        <span class="status-lbl">XP ganado</span>
+                        <span id="xp-now">0 XP</span>
+                    </div>
+                    <div class="status-row wide">
+                        <span class="status-lbl">Selección</span>
+                        <span id="sel-word">—</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="mama-bubble">
+            <div class="bubble-header">
+                <img class="bubble-avatar" id="bubble-av" src="../images/mama/mama_frame1.png" alt="">
+                <span class="bubble-name">Mama Rosa</span>
+            </div>
+            <div class="bubble-body">
+                <p id="mama-text">Encuentra los saberes rituales en la sopa de letras. Cada palabra encontrada renueva tu tiempo.</p>
+                <div class="nav-btns">
+                    <button id="btn-reset" class="nav-btn" onclick="reiniciarJuegoManual()">Reiniciar ↺</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="intro-ov" class="ov on">
+        <div class="ov-card">
+            <p class="ov-badge">🔎 Sub-juego ritual</p>
+            <h2 class="ov-title">Sopa de Letras Ancestral</h2>
+            <p class="ov-desc">Encuentra 8 palabras del ritual del Pueblo Pasto. Tienes 30 segundos por palabra, 3 fallos totales y 10 XP por cada acierto.</p>
+            <p class="ov-sub">Se puede buscar en horizontal, vertical, diagonal y al revés.</p>
+            <button class="ov-btn pri" onclick="cerrarIntro()">¡Buscar! ▶</button>
+        </div>
+    </div>
+
+    <div id="hit-ov" class="ov">
+        <div class="ov-card small success">
+            <div class="ov-emo">✨</div>
+            <p class="ov-title" id="hit-title">¡Correcto!</p>
+            <p class="ov-desc" id="hit-desc">Has encontrado una palabra.</p>
+            <button class="ov-btn pri" onclick="cerrarHit()">Continuar ▶</button>
+        </div>
+    </div>
+
+    <div id="fail-ov" class="ov">
+        <div class="ov-card small fail">
+            <div class="ov-emo">💔</div>
+            <p class="ov-title">Se agotaron tus intentos</p>
+            <p class="ov-desc">La sopa de letras se reiniciará desde el comienzo.</p>
+            <button class="ov-btn pri" onclick="reiniciarTrasDerrota()">Reiniciar ↺</button>
+        </div>
+    </div>
+
+    <div id="done-ov" class="ov">
+        <div class="ov-card success">
+            <div class="ov-emo">🏆</div>
+            <p class="ov-title">¡Rituales encontrados!</p>
+            <p class="ov-desc">Completaste la sopa de letras ancestral y ganaste 80 XP.</p>
+            <p class="ov-sub">Ahora pasarás al siguiente juego.</p>
+            <button class="ov-btn pri" onclick="irAGame4()">Continuar a Game 4 ▶</button>
+        </div>
+    </div>
+
+    <script src="../js/game3.2.js?v=3"></script>
+</body>
+</html>

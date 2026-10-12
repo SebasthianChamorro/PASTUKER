@@ -1,0 +1,230 @@
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html, body {
+    width:100%; height:100%; overflow:hidden;
+    font-family:'Nunito',sans-serif;
+    background:#1a0e05;
+    touch-action:manipulation;
+    -webkit-user-select:none; user-select:none;
+}
+#maloca-bg {
+    position:fixed; inset:0; z-index:0;
+    background:url('../images/game3/sprites/maloka.png') center/cover no-repeat;
+    image-rendering:pixelated; filter:brightness(.5);
+}
+#maloca-overlay {
+    position:fixed; inset:0; z-index:1;
+    background:linear-gradient(to bottom, rgba(10,6,3,.2) 0%, rgba(10,6,3,.1) 35%, rgba(10,6,3,.55) 72%, rgba(10,6,3,.98) 100%);
+}
+#rotate-msg {
+    display:none; position:fixed; inset:0; z-index:9999;
+    background:#1a0e05; flex-direction:column;
+    align-items:center; justify-content:center; gap:20px;
+}
+@media (orientation:portrait) { #rotate-msg { display:flex; } }
+.rot-ph { font-size:64px; animation:giro 2.5s ease-in-out infinite; }
+@keyframes giro { 0%,100%{transform:rotate(0)} 40%,60%{transform:rotate(90deg)} }
+.rot-txt { font-family:'Press Start 2P',monospace; font-size:10px; color:#d4af37; line-height:2.2; text-align:center; }
+#app {
+    position:fixed; inset:0; z-index:10;
+    display:flex; flex-direction:column;
+    padding-bottom:max(0px, env(safe-area-inset-bottom));
+}
+#topbar {
+    flex-shrink:0; min-height:38px;
+    display:flex; align-items:center; gap:10px;
+    padding:0 12px;
+    background:rgba(8,4,1,.95);
+    border-bottom:1px solid rgba(212,175,55,.2);
+}
+#btn-salir {
+    font-family:'Press Start 2P',monospace; font-size:7px;
+    color:#d4af37; text-decoration:none; white-space:nowrap;
+}
+#prog-bar {
+    flex:1; height:5px; background:rgba(255,255,255,.1);
+    border-radius:3px; overflow:hidden;
+}
+#prog-bar-fill {
+    height:100%; width:0%;
+    background:linear-gradient(to right,#8b4513,#d4af37);
+    border-radius:3px; transition:width .35s;
+}
+#nav-progress {
+    font-family:'Press Start 2P',monospace; font-size:5px;
+    color:rgba(212,175,55,.5); white-space:nowrap;
+    line-height:1.6; text-align:right;
+}
+#content-area {
+    flex:1; min-height:0;
+    display:grid; grid-template-columns: 1.25fr .75fr;
+    gap:8px; padding:8px;
+}
+#left-col, #right-col { min-height:0; }
+#sopa-card, #goals-box, #status-box {
+    background:rgba(8,4,1,.92);
+    border:1px solid rgba(212,175,55,.18);
+    border-radius:14px;
+}
+#left-col { display:flex; min-height:0; }
+#sopa-card {
+    flex:1; min-height:0;
+    display:flex; flex-direction:column;
+    padding:10px;
+}
+#sopa-header-mini {
+    display:flex; align-items:center; justify-content:space-between;
+    gap:10px; margin-bottom:8px;
+}
+#sopa-title-mini, #sopa-timer, .panel-title, .status-lbl {
+    font-family:'Press Start 2P',monospace;
+}
+#sopa-title-mini { font-size:7px; color:#d4af37; }
+#sopa-timer { font-size:8px; color:#f0d060; }
+#sopa-grid-wrap {
+    flex:1; min-height:0;
+    display:flex; align-items:center; justify-content:center;
+    padding:6px;
+}
+#sopa-grid {
+    display:grid;
+    gap:3px;
+    background:rgba(212,175,55,.05);
+    border:2px solid rgba(212,175,55,.28);
+    border-radius:12px;
+    padding:8px;
+    touch-action:none;
+}
+.sopa-cell {
+    cursor:pointer;
+    -webkit-user-select:none;
+    user-select:none;
+    width:min(5.4vh, 34px);
+    height:min(5.4vh, 34px);
+    display:flex; align-items:center; justify-content:center;
+    border-radius:7px;
+    border:1px solid rgba(212,175,55,.13);
+    background:rgba(255,255,255,.03);
+    color:#f6e7af;
+    font-family:'Press Start 2P',monospace;
+    font-size:clamp(10px,1.2vw,14px);
+    transition:background .12s, transform .12s, border-color .12s;
+}
+.sopa-cell.sel {
+    background:rgba(212,175,55,.22);
+    border-color:rgba(212,175,55,.78);
+    transform:scale(1.03);
+}
+.sopa-cell.ok {
+    background:rgba(45,139,74,.35);
+    border-color:rgba(45,139,74,.85);
+    color:#eaffee;
+}
+.sopa-cell.bad {
+    background:rgba(220,53,69,.28);
+    border-color:rgba(220,53,69,.8);
+}
+#sopa-current {
+    margin-top:8px; text-align:center;
+    font-size:13px; font-weight:800; color:rgba(255,255,255,.86);
+}
+#right-col {
+    display:flex; flex-direction:column; gap:8px;
+}
+#goals-box {
+    flex:1; min-height:0;
+    padding:10px;
+    display:flex; flex-direction:column; gap:8px;
+}
+.panel-title { font-size:7px; color:#d4af37; }
+#goal-list {
+    flex:1; min-height:0; overflow:auto;
+    display:flex; flex-direction:column; gap:7px; padding-right:2px;
+}
+.goal-item {
+    padding:8px 10px;
+    border-radius:9px;
+    border:1px solid rgba(212,175,55,.14);
+    background:rgba(255,255,255,.03);
+    color:rgba(255,255,255,.82);
+    font-size:12px; font-weight:800; line-height:1.35;
+}
+.goal-item.done {
+    background:rgba(45,139,74,.18);
+    border-color:rgba(45,139,74,.45);
+    color:#98f5b0;
+    text-decoration:line-through;
+}
+.goal-item.active {
+    border-color:rgba(212,175,55,.55);
+    background:rgba(212,175,55,.09);
+}
+#status-box {
+    flex-shrink:0;
+    padding:10px;
+    display:flex; flex-direction:column; gap:9px;
+}
+.status-row {
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+}
+.status-row.wide {
+    align-items:flex-start; flex-direction:column;
+}
+.status-lbl { font-size:6px; color:rgba(212,175,55,.55); }
+#xp-now, #sel-word {
+    font-size:12px; color:rgba(255,255,255,.88); font-weight:800; text-align:right;
+}
+#sel-word { color:#d4af37; min-height:18px; }
+#mama-bubble {
+    flex-shrink:0; min-height:88px;
+    background:rgba(5,2,0,.99); border-top:2px solid rgba(212,175,55,.35);
+    display:flex; flex-direction:column;
+    padding:7px 14px 9px; gap:5px; overflow:hidden;
+}
+.bubble-header { flex-shrink:0; display:flex; align-items:center; gap:7px; }
+.bubble-avatar { width:24px; height:auto; image-rendering:pixelated; border-radius:3px; }
+.bubble-name { font-family:'Press Start 2P',monospace; font-size:8px; color:#d4af37; }
+.bubble-body { flex:1; min-height:0; display:flex; align-items:center; gap:12px; }
+#mama-text {
+    flex:1; min-width:0;
+    font-size:clamp(12px,1.8vw,15px); color:rgba(255,255,255,.9);
+    font-weight:700; line-height:1.6; overflow:hidden;
+    display:-webkit-box; -webkit-line-clamp:3; line-clamp:3;
+    -webkit-box-orient:vertical;
+}
+.nav-btns { flex-shrink:0; display:flex; flex-direction:column; gap:6px; align-self:center; }
+.nav-btn, .ov-btn {
+    padding:8px 16px; font-family:'Press Start 2P',monospace;
+    font-size:8px; border:none; border-radius:8px; cursor:pointer;
+    white-space:nowrap; transition:transform .1s, opacity .1s;
+}
+.nav-btn:active, .ov-btn:active { transform:scale(.95); }
+#btn-reset, .ov-btn.pri { background:linear-gradient(135deg,#d4af37,#a07a20); color:#1a0e05; }
+.ov {
+    display:none; position:fixed; inset:0; z-index:500;
+    background:rgba(0,0,0,.94); backdrop-filter:blur(8px);
+    align-items:center; justify-content:center; padding:16px;
+}
+.ov.on { display:flex; }
+.ov-card {
+    background:rgba(10,6,3,.99); border:2px solid rgba(212,175,55,.5);
+    border-radius:20px; padding:clamp(16px,3vw,30px);
+    max-width:440px; width:100%; text-align:center;
+    display:flex; flex-direction:column; gap:12px; align-items:center;
+    animation:pop .45s cubic-bezier(.34,1.56,.64,1);
+}
+.ov-card.small { max-width:380px; }
+.ov-card.success { border-color:rgba(45,139,74,.5); }
+.ov-card.fail { border-color:rgba(220,53,69,.45); }
+.ov-badge { font-family:'Press Start 2P',monospace; font-size:8px; color:rgba(212,175,55,.55); }
+.ov-title { font-family:'Press Start 2P',monospace; font-size:clamp(10px,1.7vw,14px); color:#d4af37; line-height:1.55; }
+.ov-desc { font-size:12px; color:rgba(255,255,255,.72); font-weight:700; line-height:1.6; }
+.ov-sub { font-family:'Press Start 2P',monospace; font-size:7px; color:rgba(212,175,55,.45); line-height:1.7; }
+.ov-emo { font-size:50px; }
+@keyframes pop { from{opacity:0;transform:scale(.85) translateY(18px)} to{opacity:1;transform:scale(1) translateY(0)} }
+@media (max-width: 900px) {
+    #content-area { grid-template-columns: 1fr .88fr; }
+    .sopa-cell {
+        width:min(4.9vh, 30px);
+        height:min(4.9vh, 30px);
+    }
+}

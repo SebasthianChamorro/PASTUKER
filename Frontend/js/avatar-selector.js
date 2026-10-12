@@ -101,16 +101,19 @@ document.getElementById('btnGuardar').addEventListener('click', async () => {
     const btn = document.getElementById('btnGuardar');
     btn.classList.add('guardando');
 
-    /* INTEGRACIÓN BACKEND (descomentar cuando esté listo):
-    await fetch('/api/usuarios/avatar', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ style: seleccionado, seed })
-    }); */
+    /* Guardar en el dispositivo (funciona también sin conexión) */
+    localStorage.setItem('avatar_style',   seleccionado);
+    localStorage.setItem('avatar_seed',    seed);
+    localStorage.setItem('usuario_avatar', seleccionado);
 
-    /* Guardar en localStorage */
-    localStorage.setItem('avatar_style', seleccionado);
-    localStorage.setItem('avatar_seed',  seed);
+    /* Guardar en el servidor: el ranking muestra este avatar */
+    localStorage.setItem('avatar_pendiente', seleccionado);
+    if (window.Pastuker && Pastuker.estaConectado()) {
+        try {
+            const r = await Pastuker.api('/api/avatar', { method: 'POST', body: { avatar: seleccionado } });
+            if (r.ok) localStorage.removeItem('avatar_pendiente');
+        } catch { /* sin conexión: api.js lo envía en la próxima sincronización */ }
+    }
 
     /* Mostrar toast y redirigir */
     document.getElementById('toast').classList.add('visible');

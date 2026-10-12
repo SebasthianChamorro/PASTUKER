@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1a4a2e">
+    <title>Pastuker — Créditos</title>
+    <link rel="manifest" href="../manifest.json">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Nunito', sans-serif; background: linear-gradient(180deg,#0f2e1c,#1a4a2e 60%,#12331f);
+               color: rgba(255,255,255,.88); min-height: 100vh; padding: 16px; }
+        .card { max-width: 560px; margin: 0 auto; background: rgba(8,24,14,.78); border: 1.5px solid rgba(212,175,55,.35);
+                border-radius: 18px; padding: 22px 18px 28px; display: flex; flex-direction: column; gap: 14px; text-align: center; }
+        h1 { font-family: 'Press Start 2P', monospace; font-size: 14px; color: #f0d060; line-height: 1.7; }
+        h2 { font-family: 'Press Start 2P', monospace; font-size: 9px; color: #d4af37; line-height: 1.7; margin-top: 8px; }
+        p { font-size: 14px; line-height: 1.65; }
+        .logos { display: flex; gap: 18px; justify-content: center; align-items: center; flex-wrap: wrap; }
+        .logos img { height: 72px; width: auto; object-fit: contain; }
+        a { color: #f0d060; font-weight: 700; }
+        .volver { text-align: left; text-decoration: none; }
+    </style>
+</head>
+<body>
+<main class="card">
+    <a class="volver" href="menugeneral.html">← Volver al menú</a>
+    <h1>Créditos</h1>
+    <p>Pastuker es un juego educativo para preservar y compartir los saberes ancestrales del pueblo de los Pastos.</p>
+
+    <div class="logos">
+        <img src="../images/logos/logo_universidad.png" alt="Universidad">
+        <img src="../images/logos/logo_cabildo.png" alt="Cabildo indígena">
+    </div>
+
+    <h2>Saberes</h2>
+    <p>Taita Lorenzo y Mama Rosa representan a los sabedores y sabedoras de la comunidad que comparten el conocimiento de las plantas medicinales.</p>
+
+    <h2>Tecnología</h2>
+    <p>Motor de juego: Phaser 3.60 · Avatares: DiceBear · Servidor: Flask + SQLite · Aplicación web instalable (PWA) con modo sin conexión.</p>
+
+    <h2>Datos personales</h2>
+    <p>Consulta cómo cuidamos tus datos en la <a href="privacidad.html">política de tratamiento de datos</a>.</p>
+</main>
+<script src="../js/audio.js"></script>
+</body>
+</html>

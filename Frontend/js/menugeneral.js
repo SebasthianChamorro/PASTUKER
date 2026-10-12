@@ -49,15 +49,27 @@
             setTimeout(() => overlay.classList.remove('visible'), 300);
         }
 
-        btnConfirmar.addEventListener('click', () => {
-            /*
-                INTEGRACIÓN BACKEND:
-                Cuando tengas el endpoint listo:
-                await fetch('/api/auth/logout', { method: 'POST' });
-            */
-            localStorage.removeItem('usuario_nombre');
-            localStorage.removeItem('auth_token');
+        btnConfirmar.addEventListener('click', async () => {
+            btnConfirmar.disabled = true;
+            // Sube el progreso pendiente, invalida el token en el servidor
+            // y lo borra del dispositivo. Se conserva el hash local para
+            // que el jugador pueda volver a entrar sin conexión.
+            if (window.Pastuker) await Pastuker.cerrarSesion();
             window.location.href = '../index.html';
+        });
+
+        /* ── Aviso: hay progreso o un registro que aún no llegó al servidor ── */
+        window.addEventListener('load', () => {
+            if (!window.Pastuker || Pastuker.estaConectado() || !navigator.onLine) return;
+            const pendiente = Pastuker.hayRegistroPendiente() || Pastuker.LS.get('sync_pendiente');
+            if (!pendiente || !Pastuker.LS.get('usuario_telefono')) return;
+            const aviso = document.createElement('a');
+            aviso.href = 'login.html';
+            aviso.textContent = '☁ Ya tienes internet: vuelve a iniciar sesión para guardar tu progreso';
+            aviso.style.cssText = 'position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:50;' +
+                'max-width:92vw;padding:10px 16px;border-radius:12px;background:rgba(10,30,18,.95);' +
+                'border:1.5px solid #d4af37;color:#f0d060;font-size:12px;font-weight:700;text-align:center;';
+            document.body.appendChild(aviso);
         });
 
         /* ── Efecto de ripple en los items al tocar ── */

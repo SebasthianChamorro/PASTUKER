@@ -1,13 +1,9 @@
 /* ════════════════════════════════════════════════════════════════
    PASTUKER — login.js
-   Validación + integración API Flask + fallback offline
+   Validación + API Flask + inicio de sesión sin conexión
+   Requiere: js/api.js (window.Pastuker) cargado antes.
 ════════════════════════════════════════════════════════════════ */
 'use strict';
-
-// ── URL de la API ──
-// Desarrollo local : 'http://localhost:5000'
-// Producción       : 'https://TU-APP.up.railway.app'
-const API_URL = 'http://localhost:5000';
 
 /* ── Animación de entrada de la card ── */
 window.addEventListener('load', () => {
@@ -21,7 +17,7 @@ window.addEventListener('load', () => {
     }, 200);
 
     // Autocompletar teléfono si eligió "Recordarme" antes
-    const tel = localStorage.getItem('recordar_tel');
+    const tel = Pastuker.LS.get('recordar_tel');
     if (tel) {
         const input = document.getElementById('telefono');
         if (input) input.value = tel;
@@ -35,8 +31,8 @@ const ojAbierto  = btnOjo.querySelector('.ojo-abierto');
 const ojoCerrado = btnOjo.querySelector('.ojo-cerrado');
 
 btnOjo.addEventListener('click', () => {
-    const esPassword        = inputPass.type === 'password';
-    inputPass.type          = esPassword ? 'text' : 'password';
+    const esPassword         = inputPass.type === 'password';
+    inputPass.type           = esPassword ? 'text' : 'password';
     ojAbierto.style.display  = esPassword ? 'none'  : 'block';
     ojoCerrado.style.display = esPassword ? 'block' : 'none';
     btnOjo.setAttribute('aria-label', esPassword ? 'Ocultar contraseña' : 'Mostrar contraseña');
@@ -63,29 +59,6 @@ inputPass.addEventListener('input', () => {
     errPass.textContent = '';
     inputPass.closest('.campo-grupo').classList.remove('campo-error-activo');
 });
-
-/* ── SHA-256 en el navegador para fallback offline ── */
-async function sha256(str) {
-    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
-    return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
-}
-
-/* ── Guardar sesión completa en localStorage ── */
-function guardarSesion(usuario, token) {
-    localStorage.setItem('usuario_id',       usuario.id);
-    localStorage.setItem('usuario_nombre',   usuario.nombre);
-    localStorage.setItem('usuario_telefono', usuario.telefono);
-    localStorage.setItem('usuario_genero', usuario.genero);
-    localStorage.setItem('usuario_avatar',   usuario.avatar  || '');
-    localStorage.setItem('usuario_xp',       usuario.xp      || 0);
-    localStorage.setItem('usuario_token',    token);
-    if (usuario.plantas_encontradas?.length) {
-        localStorage.setItem('plantas_encontradas', JSON.stringify(usuario.plantas_encontradas));
-    }
-    if (usuario.mundo2_completo) {
-        localStorage.setItem('mundo2_completo', '1');
-    }
-}
 
 /* ── Shake de error ── */
 function shakeCard() {
@@ -114,8 +87,8 @@ function validar(telefono, password) {
         inputTel.closest('.campo-grupo').classList.add('campo-error-activo');
         ok = false;
     }
-    if (!password || password.length < 4) {
-        errPass.textContent = 'Ingresa tu contraseña';
+    if (!password || password.length < 6) {
+        errPass.textContent = 'La contraseña tiene mínimo 6 caracteres';
         inputPass.closest('.campo-grupo').classList.add('campo-error-activo');
         ok = false;
     }
@@ -127,6 +100,47 @@ function setLoading(on) {
     btnLogin.disabled = on;
     btnLogin.querySelector('.btn-login-texto').textContent = on ? 'Verificando...' : 'Iniciar Sesión';
     spinner.style.display = on ? 'inline-block' : 'none';
+}
+
+/* ── Entrar: guarda sesión + hash offline y redirige ── */
+async function entrar(usuario, token, telefono, password) {
+    Pastuker.guardarSesion(usuario, token);
+    await Pastuker.guardarHashOffline(telefono, password);
+
+    if (document.getElementById('recordarme')?.checked) {
+        Pastuker.LS.set('recordar_tel', telefono);
+    } else {
+        Pastuker.LS.del('recordar_tel');
+    }
+
+    // Sube de inmediato lo que se haya jugado sin conexión o como invitado
+    await Promise.race([Pastuker.sincronizar(), new Promise(r => setTimeout(r, 2500))]);
+
+    // Cuentas antiguas sin autorización registrada → pedirla
+    if (usuario.consentimiento === false) {
+        window.location.replace('privacidad.html?aceptar=1');
+    } else {
+        window.location.replace('menugeneral.html');
+    }
+}
+
+/* ── Registro hecho sin conexión: se crea en el servidor con la
+      contraseña que el jugador acaba de escribir (nunca se guarda en claro) ── */
+async function completarRegistroPendiente(telefono, password) {
+    const pendiente = Pastuker.LS.json('registro_pendiente', null);
+    if (!pendiente || pendiente.telefono !== telefono) return null;
+    if (!(await Pastuker.verificarOffline(telefono, password))) return null;
+
+    const r = await Pastuker.api('/api/register', {
+        method: 'POST', auth: false,
+        body: { ...pendiente, password },
+    });
+    if (r.ok) {
+        Pastuker.LS.del('registro_pendiente');
+        return r.data;
+    }
+    if (r.status === 409) Pastuker.LS.del('registro_pendiente'); // ya existía
+    return null;
 }
 
 /* ══════════════════════════════════════════════════════
@@ -145,42 +159,38 @@ form.addEventListener('submit', async (e) => {
 
     try {
         // ── 1. Intentar login ONLINE ──
-        const res  = await fetch(`${API_URL}/api/login`, {
-            method:  'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body:    JSON.stringify({ telefono, password }),
-            signal:  AbortSignal.timeout(6000),
-        });
-        const data = await res.json();
-
-        if (data.ok) {
-            // Guardar hash para fallback offline
-            const pwdHash = await sha256(password);
-            localStorage.setItem('usuario_pwd_hash', pwdHash);
-
-            guardarSesion(data.usuario, data.token);
-
-            if (document.getElementById('recordarme')?.checked) {
-                localStorage.setItem('recordar_tel', telefono);
-            } else {
-                localStorage.removeItem('recordar_tel');
-            }
-
-            window.location.replace('menugeneral.html');
-
-        } else {
-            mostrarErrorGlobal(data.msg || 'Teléfono o contraseña incorrectos');
+        let r;
+        try {
+            r = await Pastuker.api('/api/login', {
+                method: 'POST', auth: false, body: { telefono, password }, timeout: 8000,
+            });
+        } catch (err) {
+            r = null; // sin red
         }
 
-    } catch (err) {
-        // ── 2. Sin conexión — intentar OFFLINE ──
-        console.warn('Sin conexión, intentando offline...', err.message);
+        if (r && r.ok) {
+            await entrar(r.data.usuario, r.data.token, telefono, password);
+            return;
+        }
 
-        const pwdHash     = await sha256(password);
-        const pwdGuardado = localStorage.getItem('usuario_pwd_hash');
-        const telGuardado = localStorage.getItem('usuario_telefono');
+        if (r && r.status === 401) {
+            // ¿Es una cuenta creada sin conexión que aún no llegó al servidor?
+            const reg = await completarRegistroPendiente(telefono, password);
+            if (reg) { await entrar(reg.usuario, reg.token, telefono, password); return; }
+        }
 
-        if (telGuardado === telefono && pwdGuardado === pwdHash) {
+        if (r) {
+            mostrarErrorGlobal(r.data?.msg || 'Teléfono o contraseña incorrectos');
+            return;
+        }
+
+        // ── 2. Sin conexión — verificar contra el hash local (PBKDF2 con sal) ──
+        if (!Pastuker.cryptoDisponible()) {
+            mostrarErrorGlobal('Sin conexión. Este navegador no permite entrar sin internet (se necesita HTTPS).');
+            return;
+        }
+        const telGuardado = Pastuker.LS.get('usuario_pwd_tel') || Pastuker.LS.get('usuario_telefono');
+        if (await Pastuker.verificarOffline(telefono, password)) {
             window.location.replace('menugeneral.html');
         } else {
             mostrarErrorGlobal(

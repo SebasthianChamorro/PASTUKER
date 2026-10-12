@@ -1,14 +1,17 @@
 {
+    "id": "./index.html",
     "name": "Pastuker - Saberes Ancestrales Pastos",
     "short_name": "Pastuker",
-    "description": "Juego educativo para preservar el conocimiento ancestral del pueblo Pastos",
+    "description": "Juego educativo para preservar el conocimiento ancestral del pueblo de los Pastos",
     "start_url": "./index.html",
-    "display": "standalone",
+    "scope": "./",
+    "display": "fullscreen",
+    "display_override": ["fullscreen", "standalone"],
     "orientation": "portrait",
     "background_color": "#1a4a2e",
     "theme_color": "#1a4a2e",
     "lang": "es",
-    "scope": "./",
+    "dir": "ltr",
     "icons": [
         {
             "src": "images/icon-192.png",
@@ -33,14 +36,6 @@
             "sizes": "512x512",
             "type": "image/png",
             "purpose": "maskable"
-        }
-    ],
-    "screenshots": [
-        {
-            "src": "images/screenshot-mobile.png",
-            "sizes": "390x844",
-            "type": "image/png",
-            "form_factor": "narrow"
         }
     ],
     "categories": ["education", "games"],

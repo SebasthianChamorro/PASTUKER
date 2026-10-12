@@ -13,7 +13,6 @@
 </head>
 <body>
 
-    <!-- ESCENA DE FONDO -->
     <div class="escena" aria-hidden="true">
         <div class="cielo"></div>
         <img src="images/landscale/sun.png" alt="" class="sol-img">
@@ -99,7 +98,6 @@
             <img src="images/landscale/maloca.png" alt="Maloca ancestral Pastos" class="lateral-maloca-img">
         </aside>
 
-        <!-- ── TARJETA CENTRAL ── -->
         <div class="tarjeta-inicio">
 
             <div class="logos-institucionales">
@@ -134,7 +132,6 @@
                 al Resguardo indígena de Funes.
             </p>
 
-            <!-- Taita Lorenzo — burbuja manejada por dialogos.js -->
             <div class="taita-contenedor">
                 <div class="taita-dos-frames">
                     <img src="images/taita/taita_frame1.png" class="taita-frame taita-f1" alt="">
@@ -160,7 +157,7 @@
 
             <p class="nota-offline">
                 <span class="icono-wifi">📶</span>
-                Funciona 100% sin internet · Guarda tu progreso localmente
+                Funciona sin internet · Tu progreso se guarda y se sincroniza al volver la conexión
             </p>
         </div>
 
@@ -169,6 +166,7 @@
         </aside>
     </main>
 
+    <script src="js/api.js"></script>
     <script src="js/index.js"></script>
     <script src="js/dialogos.js"></script>
     <script src="js/plantas_catalogo.js"></script>
@@ -179,6 +177,7 @@
             const id = yaVisito ? 'index_regreso' : 'index_bienvenida';
             DialogoSistema.mostrarConDelay(id, 1400);
         });
+        // (El service worker lo registran js/index.js y js/api.js)
     </script>
 </body>
 </html>

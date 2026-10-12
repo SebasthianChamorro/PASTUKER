@@ -11,64 +11,23 @@
     <link rel="stylesheet" href="../css/ranking.css">
     <link rel="stylesheet" href="../css/dialogos.css">
     <style>
-        /* ── Mama Rosa — copiado de profile.css ── */
         :root { --mama-w:64px; --mama-h:64px; --mama-escala:2.5; }
-
-        .mama-en-card {
-            display: flex; flex-direction: column; align-items: center; gap: 5px;
-            padding: 10px 8px;
-            background: rgba(255,255,255,.03);
-            border: 1px solid rgba(212,175,55,.15);
-            border-radius: 14px;
-            position: relative;
-        }
-        .mama-dos-frames {
-            position: relative;
-            width: calc(var(--mama-w) * var(--mama-escala));
-            height: calc(var(--mama-h) * var(--mama-escala));
-        }
-        .mama-frame {
-            position: absolute; inset: 0;
-            width: 100%; height: 100%;
-            image-rendering: pixelated;
-            image-rendering: crisp-edges;
-        }
-        .mama-f1 { animation: mostrarF1 6s step-end infinite; }
-        .mama-f2 { animation: mostrarF2 6s step-end infinite; }
-        @keyframes mostrarF1 {
-            0%   { opacity: 1; }
-            50%  { opacity: 0; }
-            100% { opacity: 0; }
-        }
-        @keyframes mostrarF2 {
-            0%   { opacity: 0; }
-            50%  { opacity: 1; }
-            100% { opacity: 1; }
-        }
-        .mama-nombre {
-            font-family: 'Press Start 2P', monospace;
-            font-size: 8px; color: #f0d060;
-            letter-spacing: 1px;
-            text-shadow: 0 0 8px rgba(212,175,55,.3);
-        }
-        .mama-titulo-npc {
-            font-size: 9px; font-weight: 600;
-            color: rgba(255,255,255,.45);
-            font-style: italic; letter-spacing: .3px;
-        }
-
-        @media(max-width:380px) { :root { --mama-escala: 2; } }
-        @media(min-width:768px) { :root { --mama-escala: 3; } }
-        @media(prefers-reduced-motion:reduce) {
-            .mama-f1, .mama-f2 { animation: none !important; }
-            .mama-f1 { opacity: 1; }
-            .mama-f2 { opacity: 0; }
-        }
+        .mama-en-card { display:flex;flex-direction:column;align-items:center;gap:5px;padding:10px 8px;background:rgba(255,255,255,.03);border:1px solid rgba(212,175,55,.15);border-radius:14px;position:relative; }
+        .mama-dos-frames { position:relative;width:calc(var(--mama-w)*var(--mama-escala));height:calc(var(--mama-h)*var(--mama-escala)); }
+        .mama-frame { position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelated;image-rendering:crisp-edges; }
+        .mama-f1 { animation:mostrarF1 6s step-end infinite; }
+        .mama-f2 { animation:mostrarF2 6s step-end infinite; }
+        @keyframes mostrarF1 { 0%{opacity:1}50%{opacity:0}100%{opacity:0} }
+        @keyframes mostrarF2 { 0%{opacity:0}50%{opacity:1}100%{opacity:1} }
+        .mama-nombre { font-family:'Press Start 2P',monospace;font-size:8px;color:#f0d060;letter-spacing:1px;text-shadow:0 0 8px rgba(212,175,55,.3); }
+        .mama-titulo-npc { font-size:9px;font-weight:600;color:rgba(255,255,255,.45);font-style:italic; }
+        @media(max-width:380px){:root{--mama-escala:2}}
+        @media(min-width:768px){:root{--mama-escala:3}}
+        @media(prefers-reduced-motion:reduce){.mama-f1,.mama-f2{animation:none!important}.mama-f1{opacity:1}.mama-f2{opacity:0}}
     </style>
 </head>
 <body>
 
-    <!-- ESCENA DE FONDO -->
     <div class="escena" aria-hidden="true">
         <div class="cielo"></div>
         <img src="../images/landscale/sun.png"      alt="" class="sol-img">
@@ -130,21 +89,16 @@
         <div class="suelo-hierba"></div>
         <div class="suelo-tierra"></div>
         <div class="particulas">
-            <div class="particula p-1"></div>
-            <div class="particula p-2"></div>
-            <div class="particula p-3"></div>
-            <div class="particula p-4"></div>
-            <div class="particula p-5"></div>
-            <div class="particula p-6"></div>
-            <div class="particula p-7"></div>
-            <div class="particula p-8"></div>
+            <div class="particula p-1"></div><div class="particula p-2"></div>
+            <div class="particula p-3"></div><div class="particula p-4"></div>
+            <div class="particula p-5"></div><div class="particula p-6"></div>
+            <div class="particula p-7"></div><div class="particula p-8"></div>
         </div>
     </div>
 
     <main class="contenido-principal">
         <div class="ranking-card" id="rankingCard">
 
-            <!-- ── ENCABEZADO ── -->
             <div class="ranking-header">
                 <h1 class="ranking-titulo">Ranking de Jugadores</h1>
                 <p class="ranking-subtitulo">Compite y sube en la tabla de posiciones</p>
@@ -155,16 +109,12 @@
                 </div>
             </div>
 
-            <!-- ── MAMA ROSA ── -->
             <div class="mama-en-card">
-
-                <!-- Botón regresar — primer hijo, igual que profile.html -->
                 <a href="menugeneral.html" class="btn-regresar" aria-label="Regresar">
                     <svg viewBox="0 0 24 24" fill="none">
                         <path d="M19 12H5M5 12l7-7M5 12l7 7" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
                 </a>
-
                 <div class="mama-dos-frames">
                     <img src="../images/mama/mama_frame1.png" class="mama-frame mama-f1" alt="Mama Rosa">
                     <img src="../images/mama/mama_frame2.png" class="mama-frame mama-f2" alt="">
@@ -173,16 +123,14 @@
                 <p class="mama-titulo-npc">Sabia Ancestral · Guardiana de Rituales</p>
             </div>
 
-            <!-- ── TARJETAS DE RANKING ── -->
             <div class="ranking-grid">
-
                 <a href="ranking-tabla.html?modo=general" class="ranking-item card-general" id="cardGeneral">
                     <div class="ranking-icono-wrap icono-general">
                         <img src="../images/icons/trophy.png" alt="Ranking General" class="ranking-png png-trofeo">
                     </div>
                     <div class="ranking-info">
                         <p class="ranking-item-titulo">Ranking General</p>
-                        <p class="ranking-item-desc">Los mejores jugadores en todos los juegos</p>
+                        <p class="ranking-item-desc">Más XP sumando los dos mundos</p>
                     </div>
                     <div class="ranking-badge badge-general">
                         <span class="badge-icono">🏆</span>
@@ -197,7 +145,7 @@
                     </div>
                     <div class="ranking-info">
                         <p class="ranking-item-titulo">Plantas Medicinales</p>
-                        <p class="ranking-item-desc">Expertos en conocimiento de plantas medicinales</p>
+                        <p class="ranking-item-desc">Más plantas medicinales descubiertas</p>
                     </div>
                     <div class="ranking-badge badge-plantas">
                         <span class="badge-icono">🌿</span>
@@ -206,13 +154,13 @@
                     <div class="card-brillo"></div>
                 </a>
 
-                <a href="ranking-tabla.html?modo=rituales" class="ranking-item card-rituales" id="cardRituales">
+                <a href="ranking-tabla.html?modo=selva" class="ranking-item card-rituales" id="cardRituales">
                     <div class="ranking-icono-wrap icono-rituales">
-                        <img src="../images/icons/fire.png" alt="Rituales Ancestrales" class="ranking-png png-fuego">
+                        <img src="../images/icons/fire.png" alt="Selva Profunda" class="ranking-png png-fuego">
                     </div>
                     <div class="ranking-info">
-                        <p class="ranking-item-titulo">Rituales Ancestrales</p>
-                        <p class="ranking-item-desc">Expertos en rituales de la comunidad</p>
+                        <p class="ranking-item-titulo">Selva Profunda</p>
+                        <p class="ranking-item-desc">Más gemas recogidas en los 10 niveles del Mundo 2</p>
                     </div>
                     <div class="ranking-badge badge-rituales">
                         <span class="badge-icono">🔥</span>
@@ -220,10 +168,8 @@
                     </div>
                     <div class="card-brillo"></div>
                 </a>
-
             </div>
 
-            <!-- ── CÓMO FUNCIONA ── -->
             <div class="como-funciona" id="comoFunciona">
                 <div class="cf-icono">
                     <svg viewBox="0 0 24 24" fill="none">
@@ -234,8 +180,8 @@
                 </div>
                 <p class="cf-titulo">¿Cómo funciona el ranking?</p>
                 <p class="cf-texto">
-                    Gana puntos respondiendo correctamente en los juegos.
-                    ¡Entre más puntos, mejor posición!
+                    Ganas XP con cada acierto del quiz (10), cada gema (10, 20 o 35)
+                    y cada nivel completado (50). ¡Entre más XP, mejor posición!
                 </p>
             </div>
 
@@ -247,7 +193,15 @@
     <script src="../js/audio.js"></script>
     <script>
         window.addEventListener('load', () => {
-            DialogoSistema.mostrarConDelay('ranking_bienvenida', 1000);
+            // ranking_top3: el jugador está entre los 3 primeros (posición real del servidor)
+            const posicion = parseInt(localStorage.getItem('ranking_pos') || '0');
+            if (posicion >= 1 && posicion <= 3) {
+                DialogoSistema.mostrar('ranking_top3', {
+                    onCerrar: () => DialogoSistema.mostrarConDelay('ranking_bienvenida', 500)
+                });
+            } else {
+                DialogoSistema.mostrarConDelay('ranking_bienvenida', 1000);
+            }
         });
     </script>
 </body>

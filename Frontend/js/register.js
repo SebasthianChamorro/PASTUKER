@@ -1,13 +1,9 @@
 /* ════════════════════════════════════════════════════════════════
    PASTUKER — register.js
-   Validación + integración API Flask + fallback offline
+   Validación + API Flask + registro sin conexión
+   Requiere: js/api.js (window.Pastuker) cargado antes.
 ════════════════════════════════════════════════════════════════ */
 'use strict';
-
-// ── URL de la API ──
-// Desarrollo local : 'http://localhost:5000'
-// Producción       : 'https://TU-APP.up.railway.app'
-const API_URL = 'http://localhost:5000';
 
 /* ── Animación de entrada de la card ── */
 window.addEventListener('load', () => {
@@ -19,12 +15,6 @@ window.addEventListener('load', () => {
         card.style.opacity    = '1';
         card.style.transform  = 'translateY(0)';
     }, 200);
-
-    // Si hay un registro pendiente de sincronizar, intentarlo ahora
-    const pendiente = localStorage.getItem('registro_pendiente');
-    if (pendiente && navigator.onLine) {
-        _sincronizarRegistro();
-    }
 });
 
 /* ── Mostrar/ocultar contraseñas ── */
@@ -83,23 +73,11 @@ document.getElementById('confirmar').addEventListener('input', () => {
     document.getElementById('errorConfirmar').textContent = '';
     document.getElementById('confirmar').closest('.campo-grupo').classList.remove('campo-error-activo');
 });
-
-/* ── SHA-256 en el navegador para fallback offline ── */
-async function sha256(str) {
-    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
-    return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
-}
-
-/* ── Guardar sesión en localStorage ── */
-function guardarSesion(usuario, token) {
-    localStorage.setItem('usuario_id',       usuario.id || 'offline_' + Date.now());
-    localStorage.setItem('usuario_nombre',   usuario.nombre);
-    localStorage.setItem('usuario_telefono', usuario.telefono);
-    localStorage.setItem('usuario_genero', usuario.genero);
-    localStorage.setItem('usuario_avatar',   usuario.avatar || '');
-    localStorage.setItem('usuario_xp',       '0');
-    if (token) localStorage.setItem('usuario_token', token);
-}
+['aceptaDatos', 'autorizaAcudiente'].forEach(id => {
+    document.getElementById(id)?.addEventListener('change', () => {
+        document.getElementById('errorConsentimiento').textContent = '';
+    });
+});
 
 /* ── Referencias del formulario ── */
 const form           = document.getElementById('registerForm');
@@ -125,11 +103,11 @@ function setLoading(on) {
 }
 
 /* ── Validación ── */
-function validar(nombre, telefono, contrasena, confirmar, genero) {
+function validar(nombre, telefono, contrasena, confirmar, genero, acepta, acudiente) {
     let ok = true;
 
-    if (!nombre || nombre.length < 2) {
-        document.getElementById('errorNombre').textContent = 'Ingresa tu nombre completo';
+    if (!nombre || nombre.length < 2 || nombre.length > 50) {
+        document.getElementById('errorNombre').textContent = 'Ingresa tu nombre (2 a 50 letras)';
         document.getElementById('nombre').closest('.campo-grupo').classList.add('campo-error-activo');
         ok = false;
     }
@@ -142,7 +120,7 @@ function validar(nombre, telefono, contrasena, confirmar, genero) {
         document.getElementById('telefono').closest('.campo-grupo').classList.add('campo-error-activo');
         ok = false;
     }
-    if (!contrasena || contrasena.length < 6) {
+    if (!contrasena || contrasena.trim().length < 6) {
         document.getElementById('errorContrasena').textContent = 'Mínimo 6 caracteres';
         document.getElementById('contrasena').closest('.campo-grupo').classList.add('campo-error-activo');
         ok = false;
@@ -150,6 +128,11 @@ function validar(nombre, telefono, contrasena, confirmar, genero) {
     if (contrasena !== confirmar) {
         document.getElementById('errorConfirmar').textContent = 'Las contraseñas no coinciden';
         document.getElementById('confirmar').closest('.campo-grupo').classList.add('campo-error-activo');
+        ok = false;
+    }
+    if (!acepta || !acudiente) {
+        document.getElementById('errorConsentimiento').textContent =
+            'Necesitas aceptar la política y la autorización de tu acudiente';
         ok = false;
     }
     return ok;
@@ -162,76 +145,52 @@ form.addEventListener('submit', async (e) => {
     e.preventDefault();
     registerError.style.display = 'none';
 
-    const nombre    = document.getElementById('nombre').value.trim();
-    const telefono  = document.getElementById('telefono').value.trim();
-    const contrasena= document.getElementById('contrasena').value;
-    const confirmar = document.getElementById('confirmar').value;
-    const generoEl  = document.querySelector('input[name="genero"]:checked');
-    const genero    = generoEl?.value || '';
+    const nombre     = document.getElementById('nombre').value.trim();
+    const telefono   = document.getElementById('telefono').value.trim();
+    const contrasena = document.getElementById('contrasena').value.trim();
+    const confirmar  = document.getElementById('confirmar').value.trim();
+    const genero     = document.querySelector('input[name="genero"]:checked')?.value || '';
+    const acepta     = !!document.getElementById('aceptaDatos')?.checked;
+    const acudiente  = !!document.getElementById('autorizaAcudiente')?.checked;
 
-    if (!validar(nombre, telefono, contrasena, confirmar, genero)) return;
+    if (!validar(nombre, telefono, contrasena, confirmar, genero, acepta, acudiente)) return;
+
+    const datos = { nombre, telefono, genero, acepta_datos: acepta, autoriza_acudiente: acudiente };
 
     setLoading(true);
 
     try {
         // ── 1. Intentar registro ONLINE ──
-        const res  = await fetch(`${API_URL}/api/register`, {
-            method:  'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body:    JSON.stringify({ nombre, telefono, password: contrasena, genero }),
-            signal:  AbortSignal.timeout(6000),
-        });
-        const data = await res.json();
+        let r = null;
+        try {
+            r = await Pastuker.api('/api/register', {
+                method: 'POST', auth: false, body: { ...datos, password: contrasena },
+            });
+        } catch { r = null; }
 
-        if (data.ok) {
-            const pwdHash = await sha256(contrasena);
-            localStorage.setItem('usuario_pwd_hash', pwdHash);
-            guardarSesion(data.usuario, data.token);
+        if (r && r.ok) {
+            Pastuker.guardarSesion(r.data.usuario, r.data.token);
+            await Pastuker.guardarHashOffline(telefono, contrasena);
             window.location.replace('login.html');
-
-        } else {
-            mostrarErrorGlobal(data.msg || 'No se pudo crear la cuenta.');
+            return;
+        }
+        if (r) {
+            mostrarErrorGlobal(r.data?.msg || 'No se pudo crear la cuenta.');
+            return;
         }
 
-    } catch (err) {
-        // ── 2. Sin conexión — guardar localmente ──
-        console.warn('Sin conexión, guardando localmente...', err.message);
-
-        const pwdHash = await sha256(contrasena);
-        localStorage.setItem('usuario_pwd_hash', pwdHash);
-        localStorage.setItem('registro_pendiente', JSON.stringify({ nombre, telefono, password: contrasena, genero }));
-
-        guardarSesion({ nombre, telefono, genero, avatar: '' }, null);
-
-        // Escuchar cuando vuelva el internet para sincronizar
-        window.addEventListener('online', _sincronizarRegistro, { once: true });
-
+        // ── 2. Sin conexión — guardar localmente (SIN la contraseña en claro) ──
+        if (!Pastuker.cryptoDisponible()) {
+            mostrarErrorGlobal('Sin conexión. Conéctate a internet para crear tu cuenta.');
+            return;
+        }
+        Pastuker.guardarSesion({ nombre, telefono, genero, avatar: '' }, null);
+        await Pastuker.guardarHashOffline(telefono, contrasena);
+        Pastuker.LS.set('registro_pendiente', JSON.stringify({ ...datos, creado: Date.now() }));
+        // La cuenta se crea en el servidor la próxima vez que inicie sesión con internet
         window.location.replace('login.html');
 
     } finally {
         setLoading(false);
     }
 });
-
-/* ── Sincronizar registro offline cuando haya internet ── */
-async function _sincronizarRegistro() {
-    const pendiente = localStorage.getItem('registro_pendiente');
-    if (!pendiente) return;
-    try {
-        const datos = JSON.parse(pendiente);
-        const res   = await fetch(`${API_URL}/api/register`, {
-            method:  'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body:    JSON.stringify(datos),
-        });
-        const data = await res.json();
-        if (data.ok) {
-            localStorage.removeItem('registro_pendiente');
-            localStorage.setItem('usuario_id',    data.usuario.id);
-            localStorage.setItem('usuario_token', data.token);
-            console.log('✅ Registro sincronizado con el servidor.');
-        }
-    } catch (e) {
-        console.warn('Sincronización fallida, se intentará después.', e);
-    }
-}

@@ -10,6 +10,24 @@
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../css/juegos.css">
     <link rel="stylesheet" href="../css/dialogos.css">
+    <style>
+        /* ── Mundo 3 card (La Maloca) ── */
+        .card-maloca {
+            background: linear-gradient(135deg, rgba(42,26,8,.92) 0%, rgba(26,14,5,.97) 100%);
+            border-color: rgba(212,175,55,.35);
+        }
+        .card-maloca:hover, .card-maloca:focus-within {
+            border-color: rgba(212,175,55,.7);
+            box-shadow: 0 8px 32px rgba(212,175,55,.18), 0 0 0 1px rgba(212,175,55,.25);
+        }
+        .icono-maloca {
+            background: linear-gradient(135deg, rgba(212,175,55,.18), rgba(139,69,19,.25));
+            border-color: rgba(212,175,55,.3);
+        }
+        .card-maloca .card-brillo {
+            background: linear-gradient(135deg, rgba(212,175,55,.08) 0%, transparent 60%);
+        }
+    </style>
 </head>
 <body>
 
@@ -89,7 +107,6 @@
     <main class="contenido-principal">
         <div class="juegos-card" id="juegosCard">
 
-            <!-- Botón regresar -->
             <a href="menugeneral.html" class="btn-regresar" aria-label="Regresar al menú">
                 <svg viewBox="0 0 24 24" fill="none">
                     <path d="M19 12H5M5 12l7-7M5 12l7 7" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
@@ -106,7 +123,6 @@
                 </div>
             </div>
 
-            <!-- Taita Lorenzo — burbuja hardcodeada eliminada, la maneja dialogos.js -->
             <div class="taita-contenedor">
                 <div class="taita-dos-frames">
                     <img src="../images/taita/taita_frame1.png" class="taita-frame taita-f1" alt="Taita Lorenzo">
@@ -118,9 +134,10 @@
 
             <div class="juegos-grid">
 
-                <!-- Plantas Medicinales -->
+                <!-- ── MUNDO 1: Plantas Medicinales (siempre disponible) ── -->
                 <a href="game.html"
                    class="juego-card card-plantas"
+                   id="cardMundo1"
                    onclick="localStorage.setItem('mundo_actual','1'); DialogoSistema.cerrar();">
                     <div class="juego-icono-wrap icono-plantas">
                         <img src="../images/icons/plant.png" alt="Plantas Medicinales" class="juego-png png-plantas">
@@ -136,26 +153,22 @@
                     <div class="card-brillo"></div>
                 </a>
 
-                <!-- Rituales Ancestrales -->
-                <a href="game.html"
-                   class="juego-card card-rituales"
-                   onclick="localStorage.setItem('mundo_actual','2'); DialogoSistema.cerrar();">
+                <!-- ── MUNDO 2: Selva Profunda (requiere mundo 1) ── -->
+                <div class="juego-card card-rituales" id="cardMundo2">
                     <div class="juego-icono-wrap icono-rituales">
-                        <img src="../images/icons/fire.png" alt="Rituales Ancestrales" class="juego-png png-fuego">
+                        <img src="../images/icons/fire.png" alt="Selva Profunda" class="juego-png png-fuego">
                     </div>
                     <div class="juego-info">
-                        <p class="juego-titulo">Rituales Ancestrales</p>
-                        <p class="juego-desc">Aprende sobre los diferentes rituales de la comunidad</p>
+                        <p class="juego-titulo">Selva Profunda</p>
+                        <p class="juego-desc">Recorre 10 niveles, esquiva obstáculos, recoge gemas y encuentra plantas sagradas</p>
                     </div>
-                    <div class="juego-badge">
+                    <div class="juego-badge" id="badgeMundo2">
                         <span class="badge-icono">🔥</span>
                         <span class="badge-texto">Jugar</span>
                     </div>
                     <div class="card-brillo"></div>
-                </a>
-
+                </div>
             </div>
-
             <div class="como-funciona" id="comoFunciona">
                 <div class="cf-icono">
                     <svg viewBox="0 0 24 24" fill="none">
@@ -174,12 +187,48 @@
         </div>
     </main>
 
+    <script src="../js/api.js"></script>
     <script src="../js/juegos.js"></script>
     <script src="../js/dialogos.js"></script>
     <script src="../js/audio.js"></script>
     <script>
         window.addEventListener('load', () => {
+            const mundo1Completo = localStorage.getItem('mundo1_completo');
+
+            const cardMundo2  = document.getElementById('cardMundo2');
+            const badgeMundo2 = document.getElementById('badgeMundo2');
+
+            /* ── Mundo 2 ── */
+            if (mundo1Completo) {
+                cardMundo2.style.cursor = 'pointer';
+                cardMundo2.addEventListener('click', () => {
+                    DialogoSistema.cerrar();
+                    localStorage.setItem('mundo_actual', '2');
+                    DialogoSistema.mostrar('juegos_mundo1', {
+                        onCerrar: () => { window.location.href = 'game-2.html'; }
+                    });
+                });
+            } else {
+                badgeMundo2.innerHTML = '<span class="badge-icono">🔒</span><span class="badge-texto">Bloqueado</span>';
+                cardMundo2.style.opacity = '0.6';
+                cardMundo2.style.cursor  = 'not-allowed';
+                cardMundo2.addEventListener('click', () => {
+                    DialogoSistema.mostrar('juegos_mundo2_bloqueado');
+                });
+            }
+
+            /* (El Mundo 3 «La Maloca» aún no está en el menú: su código se retiró
+               porque la tarjeta no existe y el error detenía los diálogos.) */
+
+            /* ── Diálogos ── */
             DialogoSistema.mostrarConDelay('juegos_bienvenida', 1000);
+
+            document.getElementById('cardMundo1').addEventListener('mouseenter', () => {
+                const widget = document.getElementById('dialogo-widget');
+                if (!widget || widget.style.display === 'none') {
+                    DialogoSistema.mostrar('juegos_mundo1');
+                }
+            });
         });
     </script>
 </body>

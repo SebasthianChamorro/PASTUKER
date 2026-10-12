@@ -1,0 +1,6 @@
+# Base de datos con datos personales (menores de edad): nunca al repositorio
+Backend/pastuker.db
+Backend/*.db
+__pycache__/
+*.pyc
+_respaldo_antes_ajustes/
